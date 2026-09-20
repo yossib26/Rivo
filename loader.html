@@ -57,9 +57,10 @@
 </div>
 
 <script src="loader.js"></script>
+<script src="insurers.js"></script>
 <script>
   const $ = (s) => document.querySelector(s);
-  let inst = null;
+  let inst = null, companies = null, logos = null;
 
   // תוצאות לדוגמה: הפניקס היא הפוליסה הנוכחית, ליד 6 מהחברות האחרות התקבלה הצעה
   const outcomes = { "הפניקס": ["cur", "הפוליסה שלך"], "הראל": ["yes", "התקבלה הצעה"], "מגדל": ["yes", "התקבלה הצעה"], "כלל ביטוח": ["no", "לא הוצעה"],
@@ -70,8 +71,8 @@
     if (inst) inst.stop();
     $("#seek").value = 0; $("#seekVal").textContent = "—";
     inst = InsLoader.run($("#root"), {
-      duration: +$("#dur").value * 1000, seed: "preview", autoplay, doneDelay: 1200,
-      subtitle: "בודקים את עשר חברות הביטוח הגדולות עבור מאזדה CX-5 EXECUTIVE 2.0",
+      companies, logos, duration: +$("#dur").value * 1000, seed: "preview", autoplay, doneDelay: 1200,
+      subtitle: `בודקים ${companies.length} חברות ביטוח עבור מאזדה CX-5 EXECUTIVE 2.0`,
       outcome: (c) => outcomes[c] || ["no", "לא הוצעה"],
       onDone: () => { if ($("#loop").checked) start(); },
     });
@@ -81,7 +82,7 @@
   $("#replay").onclick = () => start();
   $("#pause").onclick = () => inst.stop();
   $("#seek").oninput = (e) => { $("#seekVal").textContent = e.target.value + "%"; inst.seek(+e.target.value / 100); };
-  start();
+  Insurers.load().then((rows) => { companies = rows.map((x) => x.name); logos = Insurers.logos(rows); start(); }); // החברות מהטבלה ב-DB
 </script>
 <script src="privacy.js"></script>
 </body>

@@ -1,0 +1,6 @@
+# סודות ותלויות: לא נכנסים לגיט
+.env
+.env.*
+!.env.example
+node_modules/
+*.log

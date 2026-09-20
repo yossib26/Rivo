@@ -219,6 +219,7 @@
 <div class="wrap" id="app"><div class="err muted">טוען נתונים…</div></div>
 
 <script src="loader.js"></script>
+<script src="insurers.js"></script>
 <script src="api/insurer-api.js"></script>
 <script src="api/insurers/phoenix.js"></script>
 <script src="api/insurers/harel.js"></script>
@@ -241,7 +242,8 @@ const L = {
   owner: { PRIVATE: "פרטית", PRIVATE_YOUNG_DRIVER: "פרטית – נהג צעיר" },
 };
 const FILES = ["data.json", "data2.json", "upload"];
-const POOL = InsurerApi.names(); // עשר חברות הביטוח הגדולות (נרשמות בקבצי api/insurers/)
+let POOL = []; // חברות הביטוח הפעילות מטבלת insurers ב-DB שיש להן שירות ב-api/insurers/ (נטען באתחול)
+let LOGO_PATHS = {};
 const KIND_LABEL = { comprehensive: "ביטוח רכב מקיף + חובה", third: "ביטוח רכב צד שלישי + חובה", mandatory: "ביטוח רכב חובה" };
 const KIND_SCALE = { comprehensive: 1, third: 0.35, mandatory: 0.22 };
 const MILEAGE = { lt10: "עד 10,000 ק״מ", "10-20": "10,000–20,000 ק״מ", "20-30": "20,000–30,000 ק״מ", gt30: "מעל 30,000 ק״מ" };
@@ -690,7 +692,7 @@ function openApiLayer(entry) {
   }
   const outcome = (r) => (r.ok ? ["yes", "התקבלה הצעה"] : ["no", "לא הוצעה"]);
   const loader = InsLoader.run(dlg.querySelector("#apiLayerRoot"), {
-    driven: true, minimal: true, companies: POOL,
+    driven: true, minimal: true, companies: POOL, logos: LOGO_PATHS,
   });
   loader.set(p.insuranceCompany, { state: "done", kind: "cur", text: "הפוליסה שלך" });
   POOL.filter((c) => c !== p.insuranceCompany).forEach((c) => loader.set(c, { state: "load" })); // כל הבקשות בדרך
@@ -1049,6 +1051,11 @@ document.addEventListener("click", (e) => {
     if (file === "upload") data = JSON.parse(sessionStorage.getItem("harUpload")); // קובץ אקסל שהועלה בדף הבית
     else { const r = await fetch(file); if (!r.ok) throw new Error(r.status); data = await r.json(); }
     if (!data) throw new Error("no data");
+    // רשימת החברות וכתובות השירות שלהן מהטבלה ב-DB
+    const rows = await Insurers.load();
+    POOL = rows.filter((x) => InsurerApi.has(x.name)).map((x) => x.name);
+    LOGO_PATHS = Insurers.logos(rows);
+    rows.forEach((x) => { if (x.apiEndpoint && InsurerApi.has(x.name)) InsurerApi.definition(x.name).endpoint = x.apiEndpoint; });
     const p = data.policies.find((x) => x.policyId === pid && x.category === "MOTOR");
     if (!p) return fail("הפוליסה לא נמצאה בקובץ");
     let session = null, saved = null;

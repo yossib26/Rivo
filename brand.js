@@ -10,7 +10,7 @@
   // אותם קישורי תפריט בכל העמודים; פרקי הנחיתה נפתחים בעמוד הנחיתה
   const items = [["landing.html#steps", "איך זה עובד"], ["landing.html#features", "מה מקבלים"], ["landing.html#faq", "שאלות נפוצות"]];
   if (me) items.push(["home.html", "דף הבית"], ["index.html", "הביטוחים שלי"]);
-  else if (here !== "login.html") items.push(["login.html", "כניסה"]);
+  else { if (here !== "login.html") items.push(["login.html", "כניסה"]); items.push(["login.html?mode=register", "הרשמה"]); }
   const nav = items.map(([h, t]) => `<a href="${h}"${h === here ? ' aria-current="page"' : ""}>${t}</a>`).join("");
 
   const initials = me ? me.name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("") : "";
@@ -28,7 +28,7 @@
   document.body.prepend(bar);
 
   // התנתקות
-  bar.querySelectorAll(".su-out").forEach((b) => b.addEventListener("click", () => { RivoAuth.logout(); location.href = "login.html"; }));
+  bar.querySelectorAll(".su-out").forEach((b) => b.addEventListener("click", async () => { await RivoAuth.logout(); location.href = "login.html"; }));
 
   // תפריט מובייל: נפתח בכפתור, ונסגר בבחירת קישור, ב-Esc, בלחיצה בחוץ ובמעבר לרוחב דסקטופ
   const btn = bar.querySelector("#menuBtn"), icon = bar.querySelector("#menuIcon");

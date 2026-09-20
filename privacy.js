@@ -2,7 +2,7 @@
    האישור נשמר ב-sessionStorage (rivo.privacyAck) ונמחק עם סגירת הלשונית. */
 (function () {
   const KEY = "rivo.privacyAck";
-  const TEXT = "הנתונים שלך נשמרים בדפדפן בלבד ואינם נשלחים לשרת או לחברות הביטוח, ופרטי כרטיס אשראי אינם נשמרים.";
+  const TEXT = "פרטי החשבון שלך נשמרים בשרת (הסיסמה מגובבת), ואילו נתוני הפוליסות והטפסים נשארים בדפדפן בלבד, ופרטי כרטיס אשראי אינם נשמרים.";
   let memory = null; // גיבוי אם sessionStorage חסום
   const store = {
     get() { try { return sessionStorage.getItem(KEY); } catch (e) { return memory; } },

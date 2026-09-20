@@ -8,6 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="header.css">
 <script src="auth.js"></script>
+<script src="insurers.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -187,7 +188,7 @@
           <a class="btn" href="home.html" data-source="excel">העלאת קובץ מהר הביטוח</a>
           <a class="btn ghost" href="index.html" data-source="api">התחברות דרך API</a>
         </div>
-        <div class="note">הנתונים נשארים בדפדפן שלך בגרסה הנוכחית</div>
+        <div class="note">נתוני הפוליסות והטפסים נשארים בדפדפן שלך</div>
       </div>
 
       <div class="shot" role="img" aria-label="דוגמה למסך: רכב עם התראת פקיעה והצעה חלופית מהראל">
@@ -273,7 +274,7 @@
       <h2>שאלות נפוצות</h2>
       <div>
         <div class="q"><h3>מה ההבדל בין העלאת קובץ להתחברות דרך API?</h3><p>העלאת קובץ מתאימה כשכבר הורדתם ייצוא מהר הביטוח. ההתחברות דרך API מושכת את הפוליסות ישירות, אחרי זיהוי בתעודת זהות וקוד חד-פעמי.</p></div>
-        <div class="q"><h3>מה קורה לנתונים שלי?</h3><p>בגרסה הנוכחית הנתונים נשמרים בדפדפן בלבד לאורך הסשן, ופרטי כרטיס אשראי אינם נשמרים כלל.</p></div>
+        <div class="q"><h3>מה קורה לנתונים שלי?</h3><p>פרטי החשבון (שם, טלפון, דוא״ל, והסיסמה מגובבת) נשמרים במסד נתונים. נתוני הפוליסות והטפסים נשארים בדפדפן בלבד לאורך הסשן, ופרטי כרטיס אשראי אינם נשמרים כלל.</p></div>
         <div class="q"><h3>האם ההצעות אמיתיות?</h3><p>בגרסת ההדגמה ההצעות מדומות ונוצרות אוטומטית סביב הפרמיה הנוכחית. חיבור לתעריפים אמיתיים דורש שילוב עם חברות הביטוח.</p></div>
         <div class="q"><h3>אילו סוגי כיסוי אפשר להשוות?</h3><p>חובה + צד ג׳, וחובה + מקיף. אפשר לעבור בין השניים בלחיצה ולקבל הצעות חדשות.</p></div>
       </div>
@@ -312,7 +313,14 @@
 </footer>
 
 <script>
-
+  // רשימת החברות והלוגואים נטענים מהטבלה insurers ב-DB (המבנה הסטטי למעלה נשאר אם הטעינה נכשלת)
+  Insurers.load().then((rows) => {
+    if (rows.some((x) => x.fallback)) return;
+    const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    document.querySelector(".cos ul").innerHTML = rows.map((x) => `<li>${esc(x.name)}</li>`).join("");
+    document.querySelector(".logos ul").innerHTML = rows.filter((x) => x.logo).map((x) => `<li><img src="${esc(x.logo)}" alt="${esc(x.name)}" loading="lazy"></li>`).join("");
+    document.querySelectorAll(".cos .lbl").forEach((l) => (l.textContent = `משווים עבורכם הצעות מ-${rows.length} חברות ביטוח`));
+  });
 
   // בחירה בכפתור "התחברות דרך API" מבטלת קובץ אקסל שהועלה קודם, כמו בדף הבית
   document.querySelectorAll('a[data-source="api"]').forEach((a) => a.addEventListener("click", () => {

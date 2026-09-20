@@ -20,7 +20,7 @@
   function run(root, opts = {}) {
     const o = {
       companies: COMPANIES, duration: 4200, seed: "loader", autoplay: true, onDone: null, doneDelay: 700,
-      driven: false, minimal: false, title: "בודקים הצעות מחברות הביטוח", subtitle: "בודקים את עשר חברות הביטוח הגדולות",
+      driven: false, minimal: false, logos: null, /* logos: { "שם חברה": "logos/x.png" } מה-DB */ title: "בודקים הצעות מחברות הביטוח", subtitle: "בודקים את עשר חברות הביטוח הגדולות",
       note: "הלוגואים שייכים לחברות הביטוח ומוצגים להדגמה בלבד · ההצעות מדומות", logoBase: "logos/",
       outcome: () => ["yes", "התקבלה הצעה"], // [yes|no|cur, טקסט]
       ...opts,
@@ -29,6 +29,7 @@
     const raw = o.companies.map((c) => ({ c, s: 0, d: 0.2 + rand() * 0.15 })).map((t, i) => ({ ...t, s: i * 0.065 }));
     const endRaw = Math.max(...raw.map((t) => t.s + t.d));
     const T = raw.map((t) => ({ c: t.c, start: (t.s / endRaw) * o.duration, dur: (t.d / endRaw) * o.duration, get out() { return o.outcome(this.c); } }));
+    const logoSrc = (c) => (o.logos && o.logos[c]) || (LOGOS[c] ? o.logoBase + LOGOS[c] + ".png" : null); // קודם הנתיב מה-DB, ואחרת ברירת המחדל
     const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     root.innerHTML = `
@@ -43,7 +44,7 @@
           </svg>
           ${T.map((t, i) => `
             <div class="oi wait" data-i="${i}" title="${esc(t.c)}">
-              <div class="cicon">${LOGOS[t.c] ? `<img src="${esc(o.logoBase + LOGOS[t.c])}.png" alt="${esc(t.c)}" draggable="false">` : `<span class="cfallback">${esc(t.c[0])}</span>`}<span class="mark">✓</span></div>
+              <div class="cicon">${logoSrc(t.c) ? `<img src="${esc(logoSrc(t.c))}" alt="${esc(t.c)}" draggable="false">` : `<span class="cfallback">${esc(t.c[0])}</span>`}<span class="mark">✓</span></div>
               <div class="oname">${esc(t.c)}</div>
             </div>`).join("")}
           <div class="ocenter"><div class="opct">0%</div><div class="ocap">מתחילים…</div></div>

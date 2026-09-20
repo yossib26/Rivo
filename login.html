@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>כניסה למערכת</title>
+<title>כניסה והרשמה</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="header.css">
 <script src="auth.js"></script>
@@ -52,6 +52,8 @@
   .sms { margin: 0 0 16px; padding: 12px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; font-size: 14px; }
   .sms .code { font-size: 22px; font-weight: 700; letter-spacing: 4px; color: var(--accent); direction: ltr; unicode-bidi: isolate; display: inline-block; }
   input.otp { letter-spacing: 8px; font-size: 22px; text-align: center; }
+  .switch { margin: 14px 0 0; font-size: 14px; text-align: center; color: var(--muted); }
+  .hint { display: block; margin-top: 4px; font-size: 12.5px; color: var(--muted); }
   .links { display: flex; justify-content: space-between; margin-top: 14px; }
   .lk { background: none; border: 0; padding: 4px 2px; color: var(--accent); text-decoration: underline; font-size: 14px; }
   .lk:disabled { color: var(--muted); text-decoration: none; cursor: default; }
@@ -85,7 +87,7 @@
     <h1>כניסה למערכת</h1>
     <p class="sub">התחברו כדי לראות ולהשוות את פוליסות הרכב.</p>
     <p class="demo-note" id="expiredNote" hidden>תוקף הכניסה פג. הכניסה נשמרת ל-30 דקות בלבד, ובלשונית הנוכחית בלבד. יש להתחבר מחדש.</p>
-    <p class="demo-note">מצב הדגמה · אין חיבור אמיתי ל-Google או לשרת. הסיסמאות ושמות המשתמש מוגדרים בדפדפן בלבד. כניסה בשם משתמש וסיסמה מחייבת קוד חד-פעמי (OTP). הכניסה תקפה ל-30 דקות, בלשונית הנוכחית בלבד.</p>
+    <p class="demo-note">מצב הדגמה · אין חיבור אמיתי ל-Google. כניסה בשם משתמש וסיסמה מחייבת קוד חד-פעמי (OTP). הכניסה תקפה ל-30 דקות.</p>
 
     <button type="button" class="gbtn" id="google"><span class="g" aria-hidden="true">G</span>המשך עם חשבון Google</button>
     <div class="or">או</div>
@@ -100,12 +102,36 @@
       <div class="err" id="err" role="alert"></div>
       <button type="submit" class="primary" id="go">כניסה</button>
     </form>
+    <p class="switch">אין לך חשבון? <button type="button" class="lk" id="toRegister">יצירת חשבון</button></p>
 
     <section class="demo" aria-labelledby="dh">
       <h2 id="dh">משתמשי הדגמה</h2>
       <p>לחיצה על משתמש ממלאת את הפרטים בטופס. אחרי הסיסמה נשלח קוד חד-פעמי לטלפון של המשתמש.</p>
       <div class="acc" id="acc"></div>
     </section>
+    </div>
+
+    <div id="stepR" hidden>
+      <h1>יצירת חשבון</h1>
+      <p class="sub">פותחים חשבון עם חשבון Google או עם שם משתמש וסיסמה.</p>
+      <button type="button" class="gbtn" id="googleR"><span class="g" aria-hidden="true">G</span>הרשמה עם חשבון Google</button>
+      <div class="or">או</div>
+      <form id="regForm" novalidate>
+        <label class="f">שם מלא<div class="in"><input id="rName" type="text" autocomplete="name" maxlength="80"></div></label>
+        <label class="f">שם משתמש<div class="in"><input id="rUser" type="text" class="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30"></div>
+          <span class="hint">3–30 תווים: אותיות אנגליות קטנות, ספרות, נקודה, מקף או קו תחתון</span></label>
+        <label class="f">סיסמה<div class="in"><input id="rPass" type="password" class="ltr" autocomplete="new-password" maxlength="100"><button type="button" class="eye" id="eyeR" aria-label="הצגת הסיסמה">הצג</button></div>
+          <span class="hint">לפחות 8 תווים, עם אות באנגלית וספרה</span></label>
+        <label class="f">אימות סיסמה<div class="in"><input id="rPass2" type="password" class="ltr" autocomplete="new-password" maxlength="100"></div></label>
+        <label class="f">טלפון נייד<div class="in"><input id="rPhone" type="text" class="ltr" inputmode="numeric" autocomplete="tel" maxlength="10" placeholder="05XXXXXXXX"></div>
+          <span class="hint">נשלח אליו קוד אימות, וגם בכל כניסה עתידית</span></label>
+        <label class="f">דוא״ל (אופציונלי)<div class="in"><input id="rEmail" type="email" class="ltr" autocomplete="email" maxlength="120"></div></label>
+        <label class="f">תעודת זהות (אופציונלי)<div class="in"><input id="rId" type="text" class="ltr" inputmode="numeric" maxlength="9"></div>
+          <span class="hint">משמשת למילוי אוטומטי של טפסים</span></label>
+        <div class="err" id="rErr" role="alert"></div>
+        <button type="submit" class="primary" id="rGo">יצירת חשבון</button>
+      </form>
+      <p class="switch">כבר יש חשבון? <button type="button" class="lk" id="toLogin">כניסה</button></p>
     </div>
 
     <div id="step2" hidden>
@@ -142,28 +168,40 @@
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const next = RivoAuth.safeNext(new URLSearchParams(location.search).get("next") || "home.html");
   const initials = (n) => (n || "?").trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("");
-  const go = (u) => { RivoAuth.login(u); location.replace(next); };
+  const go = () => location.replace(next);
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const show = (id) => ["step1", "stepR", "step2"].forEach((v) => ($("#" + v).hidden = v !== id));
+  const netErr = (r) => (r.status === 0 ? "אין תקשורת עם השרת. בדקו שהשרת רץ (npm start)." : "אירעה שגיאה. נסו שוב.");
 
-  if (RivoAuth.user()) location.replace(next); // כבר מחובר
-  else if (new URLSearchParams(location.search).get("expired") || RivoAuth.wasExpired()) $("#expiredNote").hidden = false;
+  // כבר מחובר (למשל בלשונית חדשה באותו דפדפן)? השרת קובע לפי עוגיית הסשן
+  RivoAuth.validate().then(async (ok) => {
+    if (ok) return go();
+    if (new URLSearchParams(location.search).get("expired") || RivoAuth.wasExpired()) $("#expiredNote").hidden = false;
+    const demo = await RivoAuth.demo(); // משתמשי הדמה והחשבונות המדומים נטענים מהשרת, ורק במצב הדגמה
+    if (!demo) { $(".demo").hidden = true; $("#google").hidden = true; $("#googleR").hidden = true; document.querySelectorAll(".or").forEach((o) => (o.hidden = true)); return; }
+    setupDemo(demo);
+  });
 
-  // משתמשי הדגמה
-  $("#acc").innerHTML = RivoAuth.USERS.map((u) => `<button type="button" data-u="${esc(u.username)}"><span><b>${esc(u.name)}</b><small>${esc(u.role)}</small></span><code>${esc(u.username)} / ${esc(u.password)}</code></button>`).join("");
-  $("#acc").onclick = (e) => {
-    const b = e.target.closest("button[data-u]"); if (!b) return;
-    const u = RivoAuth.USERS.find((x) => x.username === b.dataset.u);
-    $("#u").value = u.username; $("#p").value = u.password; $("#err").textContent = ""; $("#go").focus();
-  };
-  $("#u").value = RivoAuth.USERS[1].username; $("#p").value = RivoAuth.USERS[1].password; // ברירת מחדל להדגמה
+  function setupDemo(demo) {
+    $("#acc").innerHTML = demo.users.map((u) => `<button type="button" data-u="${esc(u.username)}" data-p="${esc(u.password)}"><span><b>${esc(u.name)}</b><small>${esc(u.role)}</small></span><code>${esc(u.username)} / ${esc(u.password)}</code></button>`).join("");
+    $("#acc").onclick = (e) => {
+      const b = e.target.closest("button[data-u]"); if (!b) return;
+      $("#u").value = b.dataset.u; $("#p").value = b.dataset.p; $("#err").textContent = ""; $("#go").focus();
+    };
+    const d = demo.users[1] || demo.users[0]; $("#u").value = d.username; $("#p").value = d.password; // ברירת מחדל להדגמה
+    googleAccounts = demo.google;
+  }
+  let googleAccounts = [];
 
   $("#eye").onclick = () => { const p = $("#p"), show = p.type === "password"; p.type = show ? "text" : "password"; $("#eye").textContent = show ? "הסתר" : "הצג"; $("#eye").setAttribute("aria-label", show ? "הסתרת הסיסמה" : "הצגת הסיסמה"); };
 
-  // כניסה בשם משתמש וסיסמה
+  // שלב 1: שם משתמש וסיסמה (נבדקים בשרת מול Neon)
   let lockTimer;
-  function showLock() {
+  function showLock(seconds) {
     clearInterval(lockTimer);
+    const until = Date.now() + seconds * 1000;
     const tick = () => {
-      const s = RivoAuth.lockedFor();
+      const s = Math.ceil((until - Date.now()) / 1000);
       if (s <= 0) { clearInterval(lockTimer); $("#go").disabled = false; $("#err").textContent = ""; return; }
       $("#go").disabled = true; $("#err").textContent = `יותר מדי ניסיונות. אפשר לנסות שוב בעוד ${s} שניות.`;
     };
@@ -174,20 +212,19 @@
     const u = $("#u").value, p = $("#p").value;
     if (!u.trim() || !p) return ($("#err").textContent = "יש להזין שם משתמש וסיסמה.");
     $("#go").disabled = true; $("#go").textContent = "מתחבר…";
-    await new Promise((r) => setTimeout(r, 500));
-    const r = RivoAuth.tryPassword(u, p);
+    const r = await RivoAuth.login(u, p);
     $("#go").textContent = "כניסה";
-    if (r.ok) return showOtp(r.user);
+    if (r.status === 200) return showOtp(r.data, "login");
     $("#go").disabled = false;
-    if (r.locked) return showLock();
-    $("#err").textContent = `שם משתמש או סיסמה שגויים. נותרו ${r.left} ניסיונות.`; $("#p").select();
+    if (r.status === 429) return showLock(r.data.retryAfter || 30);
+    if (r.status === 401) { $("#err").textContent = `שם משתמש או סיסמה שגויים.${r.data.left != null ? ` נותרו ${r.data.left} ניסיונות.` : ""}`; return $("#p").select(); }
+    $("#err").textContent = netErr(r);
   };
-  if (RivoAuth.lockedFor() > 0) showLock();
 
-  // שלב שני: קוד חד-פעמי אחרי סיסמה נכונה
-  let resendTimer, sentAt = 0, pendingUser = null;
-  const mask = (ph) => (ph ? `${ph.slice(0, 3)}-***-${ph.slice(-4)}` : "המספר הרשום בחשבון");
-  function typeCode(code) { // הקוד מוקלד לשדה אוטומטית, כמו השלמת SMS
+  // שלב 2: קוד חד-פעמי אחרי סיסמה נכונה
+  let challenge = null, resendTimer, sentAt = 0;
+  const mask = (ph) => ph || "המספר הרשום בחשבון";
+  function typeCode(code) { // במצב הדגמה הקוד מוקלד לשדה אוטומטית, כמו השלמת SMS
     const input = $("#otp"); let i = 0;
     setTimeout(function step() {
       if (!input.isConnected || input.value !== code.slice(0, i)) return; // המשתמש התחיל להקליד
@@ -195,10 +232,15 @@
       input.value = code.slice(0, ++i); setTimeout(step, 90);
     }, 900);
   }
-  function sendCode() {
-    const { code, phone } = RivoAuth.startOtp(pendingUser); sentAt = Date.now();
-    $("#otpSub").textContent = `שלחנו קוד בן 6 ספרות אל ${mask(phone)}.`;
-    $("#sms").innerHTML = `<b>הודעת SMS מדומה</b><br>קוד האימות שלך ל-Rivo: <span class="code">${esc(code)}</span>`;
+  let otpPurpose = "login";
+  function showOtp(ch, purpose = otpPurpose) {
+    otpPurpose = purpose; challenge = ch; sentAt = Date.now();
+    $("#step2 h1").textContent = purpose === "register" ? "אימות מספר הטלפון" : "אימות בקוד חד-פעמי";
+    show("step2");
+    $("#otpSub").textContent = `שלחנו קוד בן 6 ספרות אל ${mask(ch.phoneMasked)}.`;
+    $("#sms").innerHTML = ch.demoCode
+      ? `<b>הודעת SMS מדומה</b><br>קוד האימות שלך ל-Rivo: <span class="code">${esc(ch.demoCode)}</span>`
+      : `<b>הקוד נשלח בהודעת SMS</b><br>הזינו את הקוד שהתקבל.`;
     $("#otp").value = ""; $("#otpErr").textContent = ""; $("#otpGo").disabled = false;
     clearInterval(resendTimer);
     const tick = () => {
@@ -207,53 +249,85 @@
       if (!left) clearInterval(resendTimer);
     };
     tick(); resendTimer = setInterval(tick, 1000);
-    typeCode(code);
+    $("#otp").focus();
+    if (ch.demoCode) typeCode(ch.demoCode);
   }
-  function showOtp(user) {
-    pendingUser = user;
-    $("#step1").hidden = true; $("#step2").hidden = false;
-    sendCode(); $("#otp").focus();
+  async function resend(message) {
+    const r = await RivoAuth.resendOtp(challenge.challengeId);
+    if (r.status === 200) { showOtp(r.data); if (message) $("#otpErr").textContent = message; }
+    else if (r.status === 429) $("#otpErr").textContent = `אפשר לבקש קוד חדש בעוד ${r.data.retryAfter} שניות.`;
+    else { $("#otpErr").textContent = r.data.error === "expired" ? "הכניסה פגה. חזרו והתחילו מחדש." : netErr(r); }
   }
   $("#otp").oninput = (e) => (e.target.value = e.target.value.replace(/\D/g, ""));
-  $("#resend").onclick = () => sendCode();
-  $("#back").onclick = () => { RivoAuth.cancelOtp(); clearInterval(resendTimer); $("#step2").hidden = true; $("#step1").hidden = false; $("#p").focus(); };
+  $("#resend").onclick = () => resend();
+  $("#back").onclick = () => { clearInterval(resendTimer); challenge = null; const reg = otpPurpose === "register"; show(reg ? "stepR" : "step1"); $(reg ? "#rPass" : "#p").focus(); };
   $("#otpForm").onsubmit = async (e) => {
     e.preventDefault();
     const v = $("#otp").value.trim();
     if (v.length !== 6) return ($("#otpErr").textContent = "קוד OTP מורכב מ-6 ספרות.");
     $("#otpGo").disabled = true; $("#otpGo").textContent = "מאמת…";
-    await new Promise((r) => setTimeout(r, 500));
-    const r = RivoAuth.verifyOtp(v);
+    const r = await RivoAuth.verifyOtp(challenge.challengeId, v);
     $("#otpGo").textContent = "אימות וכניסה";
-    if (r.ok) { clearInterval(resendTimer); return go(r.user); }
-    if (r.reason === "wrong") { $("#otpGo").disabled = false; $("#otp").value = ""; $("#otp").focus(); return ($("#otpErr").textContent = `קוד שגוי. נותרו ${r.left} ניסיונות.`); }
-    sendCode(); $("#otpErr").textContent = r.reason === "locked" ? "3 ניסיונות שגויים. נשלח קוד חדש." : "הקוד פג תוקף. נשלח קוד חדש.";
+    if (r.status === 200) { clearInterval(resendTimer); return go(); }
+    if (r.data.error === "wrong") { $("#otpGo").disabled = false; $("#otp").value = ""; $("#otp").focus(); return ($("#otpErr").textContent = `קוד שגוי. נותרו ${r.data.left} ניסיונות.`); }
+    if (r.data.error === "locked" || r.data.error === "expired") return resend(r.data.error === "locked" ? "3 ניסיונות שגויים. נשלח קוד חדש." : "הקוד פג תוקף. נשלח קוד חדש.");
+    $("#otpGo").disabled = false; $("#otpErr").textContent = netErr(r);
   };
 
-  // כניסה עם Google (מדומה): בחירת חשבון
+  // יצירת חשבון עם שם משתמש וסיסמה: טופס, אימות הטלפון ב-OTP, ואז כניסה
+  $("#toRegister").onclick = () => { show("stepR"); $("#rName").focus(); };
+  $("#toLogin").onclick = () => { show("step1"); $("#u").focus(); };
+  $("#eyeR").onclick = () => { const p = $("#rPass"), on = p.type === "password"; p.type = on ? "text" : "password"; $("#eyeR").textContent = on ? "הסתר" : "הצג"; $("#eyeR").setAttribute("aria-label", on ? "הסתרת הסיסמה" : "הצגת הסיסמה"); };
+  const regFields = { name: "#rName", username: "#rUser", password: "#rPass", phone: "#rPhone", email: "#rEmail", idNumber: "#rId" };
+  $("#regForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const v = (id) => $(id).value.trim(), body = { name: v("#rName"), username: v("#rUser").toLowerCase(), password: $("#rPass").value, phone: v("#rPhone"), email: v("#rEmail"), idNumber: v("#rId") };
+    const fail = (msg, field) => { $("#rErr").textContent = msg; if (field) $(regFields[field]).focus(); };
+    if (body.name.length < 2) return fail("יש להזין שם מלא.", "name");
+    if (!/^[a-z0-9][a-z0-9._-]{2,29}$/.test(body.username)) return fail("שם משתמש: 3–30 תווים באנגלית קטנה, ספרות, נקודה, מקף או קו תחתון.", "username");
+    if (body.password.length < 8 || !/[A-Za-z]/.test(body.password) || !/\d/.test(body.password)) return fail("סיסמה: לפחות 8 תווים, עם אות באנגלית וספרה.", "password");
+    if (body.password !== $("#rPass2").value) return fail("אימות הסיסמה אינו זהה לסיסמה.");
+    if (!/^05\d{8}$/.test(body.phone)) return fail("מספר נייד: 10 ספרות שמתחילות ב-05.", "phone");
+    $("#rErr").textContent = ""; $("#rGo").disabled = true; $("#rGo").textContent = "יוצר חשבון…";
+    const r = await RivoAuth.register(body);
+    $("#rGo").disabled = false; $("#rGo").textContent = "יצירת חשבון";
+    if (r.status === 200) return showOtp(r.data, "register");
+    if (r.status === 400) return fail(r.data.message || "אחד הפרטים אינו תקין.", r.data.field);
+    if (r.status === 409) return fail(r.data.error === "email_taken" ? "כתובת הדוא״ל כבר רשומה. אפשר להיכנס איתה." : "שם המשתמש תפוס. בחרו שם אחר.", r.data.error === "email_taken" ? "email" : "username");
+    if (r.status === 429) return fail("יותר מדי הרשמות. נסו שוב מאוחר יותר.");
+    fail(netErr(r));
+  };
+
+  // כניסה והרשמה עם Google (מדומה): בחירת חשבון. אין OTP
   const dlg = $("#gdlg");
-  $("#google").onclick = () => {
+  const openGoogle = () => {
     $("#gother").hidden = true; $("#gl").hidden = false; $("#gerr").textContent = "";
-    $("#gl").innerHTML = RivoAuth.GOOGLE_ACCOUNTS.map((a, i) => `<li><button type="button" data-i="${i}"><span class="av">${esc(initials(a.name))}</span><span><b>${esc(a.name)}</b><small>${esc(a.email)}</small></span></button></li>`).join("")
+    $("#gl").innerHTML = googleAccounts.map((a, i) => `<li><button type="button" data-i="${i}"><span class="av">${esc(initials(a.name))}</span><span><b>${esc(a.name)}</b><small>${esc(a.email)}</small></span></button></li>`).join("")
       + `<li><button type="button" data-other><span class="av alt" aria-hidden="true">+</span><span><b>שימוש בחשבון אחר</b></span></button></li>`;
     dlg.showModal();
   };
+  $("#google").onclick = openGoogle; $("#googleR").onclick = openGoogle;
   $("#gclose").onclick = () => dlg.close();
+  async function googleLogin(account, errEl) {
+    const r = await RivoAuth.google(account);
+    if (r.status === 200) return go();
+    errEl.textContent = r.status === 403 ? "כניסה עם Google אינה זמינה." : r.status === 400 ? "כתובת דוא״ל לא תקינה." : netErr(r);
+    $("#gl").hidden = true; $("#gother").hidden = false;
+  }
   $("#gl").onclick = async (e) => {
     const b = e.target.closest("button"); if (!b) return;
     if (b.hasAttribute("data-other")) { $("#gl").hidden = true; $("#gother").hidden = false; $("#gmail").focus(); return; }
-    const acc = RivoAuth.GOOGLE_ACCOUNTS[+b.dataset.i];
+    const acc = googleAccounts[+b.dataset.i];
     b.innerHTML = `<span class="av">${esc(initials(acc.name))}</span><span><b>מתחברים…</b></span>`;
-    await new Promise((r) => setTimeout(r, 600));
-    go(RivoAuth.googleUser(acc));
+    await googleLogin({ email: acc.email, name: acc.name }, $("#gerr"));
   };
   $("#gother").onsubmit = async (e) => {
     e.preventDefault();
     const m = $("#gmail").value.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m)) return ($("#gerr").textContent = "כתובת דוא״ל לא תקינה.");
-    await new Promise((r) => setTimeout(r, 500));
-    go(RivoAuth.googleUser({ email: m }));
+    await googleLogin({ email: m }, $("#gerr"));
   };
+if (new URLSearchParams(location.search).get("mode") === "register") show("stepR");
 </script>
 <script src="privacy.js"></script>
 </body>
