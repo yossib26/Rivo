@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rivo · השוואת ביטוחי רכב</title>
+<meta name="description" content="Rivo מרכזת את פוליסות הרכב מהר הביטוח ומשווה הצעות מעשר חברות הביטוח הגדולות.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="header.css">
+<script src="auth.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #1f4e8c; --navy: #14335c; --ink: #1b2733; --muted: #5b6673; --line: #dfe4ea;
+    --soft: #f3f5f8; --pale: #e8eef6; --steel: #6f93c2; --ok: #2b6b4c; --crit: #a63a32; --crit-soft: #f8ebea;
+    --pad: clamp(20px, 4vw, 48px);
+    --serif: "Heebo", "Segoe UI", Arial, sans-serif; /* אותו גופן בכותרות ובטקסט, כמו בשאר המערכת */
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: #fff; color: var(--ink); font-family: "Heebo", "Segoe UI", Arial, sans-serif; font-size: 16px; line-height: 1.6; }
+  a { color: var(--accent); text-decoration: none; }
+  h1, h2 { font-family: var(--serif); color: var(--navy); margin: 0; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding-inline: var(--pad); }
+  section { scroll-margin-top: 72px; }
+
+  /* כפתורים */
+  .btn { display: inline-block; padding: 10px 24px; border-radius: 6px; font-weight: 600; font-size: 15px; border: 1px solid var(--accent); background: var(--accent); color: #fff; text-align: center; }
+  .btn:hover { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .btn.ghost { background: #fff; color: var(--accent); border-color: #b3bfcd; }
+  .btn.ghost:hover { background: var(--pale); border-color: var(--accent); color: var(--accent); }
+  .btn.light { background: #fff; color: var(--navy); border-color: #fff; }
+  .btn.light:hover { background: var(--pale); color: var(--navy); }
+  .btn.outline { background: transparent; color: #fff; border: 2px solid #fff; }
+  .btn.outline:hover { background: rgba(255,255,255,.12); color: #fff; }
+  a:focus-visible, .btn:focus-visible { outline: 3px solid #9fc0e6; outline-offset: 2px; }
+
+  /* ניווט */
+  .brand { display: flex; align-items: center; gap: 12px; color: var(--ink); }
+  .brand svg { width: 34px; height: 34px; }
+  .brand span { font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--accent); line-height: 1; }
+
+  /* פתיחה */
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: center; padding-block: clamp(36px, 5vw, 64px); }
+  .eyebrow { font-size: 14px; font-weight: 600; letter-spacing: .04em; color: var(--accent); }
+  .hero h1 { font-size: clamp(30px, 3.6vw, 40px); line-height: 1.15; font-weight: 700; margin: 12px 0 16px; }
+  .hero p.lead { font-size: 17px; line-height: 1.6; color: var(--muted); margin: 0 0 24px; max-width: 34em; }
+  .hero .cta { display: flex; flex-wrap: wrap; gap: 14px; }
+  .hero .note { margin-top: 14px; font-size: 14px; color: var(--muted); }
+
+  .shot { position: relative; padding: 0 0 44px 24px; }
+  .shot::before { content: ""; position: absolute; inset: 44px 0 0 0; background: var(--pale); border-radius: 10px; }
+  .card { position: relative; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .card .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .card .car { font-size: 18px; font-weight: 700; }
+  .plate { direction: ltr; padding: 2px 10px; background: #ffd936; border: 2px solid #111; border-radius: 5px; font-size: 14px; font-weight: 700; letter-spacing: .1em; color: #111; }
+  .card .sub { font-size: 14px; color: var(--muted); }
+  .card .price { font-size: 24px; font-weight: 700; }
+  .card .price small { font-size: 13px; font-weight: 400; color: var(--muted); }
+  .dates { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .bar { height: 6px; background: var(--line); }
+  .bar i { display: block; height: 100%; width: 97%; background: var(--crit); margin-inline-start: auto; }
+  .alert { padding: 10px 14px; background: var(--crit-soft); border-radius: 6px; border-inline-start: 4px solid var(--crit); font-size: 14px; line-height: 1.45; }
+  .card hr { border: 0; height: 1px; background: var(--line); width: 100%; margin: 0; }
+  .card .alt-l { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .alt { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border: 2px solid var(--accent); border-radius: 8px; }
+  .alt b { display: block; font-size: 18px; }
+  .alt span { font-size: 13px; color: var(--ok); font-weight: 600; }
+  .alt .p { font-size: 24px; font-weight: 700; }
+  .card .demo { font-size: 12px; color: var(--muted); }
+
+  /* איך זה עובד */
+  .steps { background: var(--soft); }
+  .steps .wrap, .features .wrap { padding-block: clamp(36px, 5vw, 64px); }
+  h2.sec { font-size: clamp(22px, 2.4vw, 28px); font-weight: 700; line-height: 1.2; margin-bottom: clamp(20px, 3vw, 32px); }
+  .cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 3.4vw, 48px); }
+  .step { border-top: 2px solid var(--navy); padding-top: 16px; }
+  .step .n { font-family: var(--serif); font-size: 36px; font-weight: 600; line-height: 1; color: var(--steel); }
+  .step h3, .feat h3 { margin: 10px 0 8px; font-size: 20px; line-height: 1.3; }
+  .step p, .feat p { margin: 0; color: var(--muted); line-height: 1.6; }
+
+  /* יתרונות */
+  .feats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(32px, 5vw, 72px); }
+  .feat { display: flex; gap: 18px; padding: 22px 0; border-top: 1px solid var(--line); }
+  .feat svg { width: 32px; height: 32px; flex: none; color: var(--accent); }
+  .feat h3 { margin-top: 0; font-size: 18px; }
+
+  /* חברות */
+  .cos { background: var(--navy); color: #fff; }
+  .cos .wrap { padding-block: 36px; }
+  .cos .lbl { font-size: 15px; font-weight: 600; color: #b3bfcd; margin-bottom: 16px; }
+  .cos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 0; font-family: var(--serif); font-size: clamp(17px, 1.6vw, 20px); font-weight: 600; }
+  .cos li { padding-inline: 20px; border-inline-start: 1px solid #4a6a95; line-height: 1.2; }
+  .cos li:first-child { padding-inline-start: 0; border-inline-start: 0; }
+
+  /* שאלות */
+  .faq .wrap { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); padding-block: clamp(36px, 5vw, 64px); align-items: start; }
+  .faq h2 { font-size: clamp(22px, 2.4vw, 28px); line-height: 1.2; margin: 0; }
+  .q { padding: 16px 0; border-top: 1px solid var(--line); }
+  .q:last-child { border-bottom: 1px solid var(--line); }
+  .q h3 { margin: 0 0 6px; font-size: 17px; line-height: 1.35; }
+  .q p { margin: 0; color: var(--muted); }
+
+  /* קריאה לפעולה */
+  .start { background: var(--accent); color: #fff; }
+  .start .wrap { display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; padding-block: clamp(36px, 5vw, 56px); }
+  .start h2 { color: #fff; font-size: clamp(22px, 2.8vw, 32px); line-height: 1.2; max-width: 16em; }
+  .start .btns { display: flex; flex-direction: column; gap: 10px; width: min(300px, 100%); }
+
+  /* תחתית */
+  footer .wrap { display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; padding-block: 32px; }
+  footer .brand span { font-size: 22px; }
+  footer .brand svg { width: 30px; height: 30px; }
+  footer p { margin: 10px 0 0; max-width: 34em; font-size: 14px; color: var(--muted); }
+  footer nav { display: flex; gap: 24px; font-size: 15px; font-weight: 500; }
+  footer nav a { color: var(--ink); }
+
+  /* תפריט מובייל (מוסתר בדסקטופ) */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+  /* טאבלט ומובייל */
+  @media (max-width: 960px) {
+    .hero .wrap, .faq .wrap { grid-template-columns: 1fr; }
+    .cols3 { grid-template-columns: 1fr; }
+    .feats { grid-template-columns: 1fr; }
+    .shot { padding-left: 0; }
+    .btn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  }
+
+  @media (max-width: 720px) {
+    body { font-size: 16px; }
+    .hero .cta { flex-direction: column; align-items: stretch; }
+    .hero .cta .btn { width: 100%; }
+    .hero p.lead { font-size: 16px; }
+    .card { padding: 16px; }
+    .card .row { gap: 8px; }
+    .steps .wrap, .features .wrap, .faq .wrap { padding-block: 32px; }
+    .step .n { font-size: 30px; }
+    .feat { gap: 14px; padding: 18px 0; }
+    .cos .wrap { padding-block: 28px; }
+    .cos ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; font-size: 18px; }
+    .cos li, .cos li:first-child { padding: 0; border: 0; }
+    .start .wrap { flex-direction: column; align-items: stretch; gap: 24px; }
+    .start .btns { width: 100%; }
+    .start h2 { max-width: none; }
+    footer .wrap { flex-direction: column; align-items: flex-start; gap: 20px; padding-block: 28px; }
+    footer nav { flex-wrap: wrap; gap: 8px 20px; }
+    footer nav a { padding: 6px 0; }
+  }
+
+  @media (max-width: 380px) {
+    :root { --pad: 16px; }
+    .brand span { font-size: 22px; }
+    .hero h1 { font-size: 28px; }
+    .alt b, .card .price, .alt .p { font-size: 20px; }
+    .card .car { font-size: 16px; }
+  }
+
+  /* לוגואים של החברות (בחלק התחתון) */
+  .logos { background: var(--soft); border-top: 1px solid var(--line); }
+  .logos .wrap { padding-block: clamp(32px, 4vw, 48px); }
+  .logos h2 { font-size: 15px; font-weight: 600; color: var(--muted); margin: 0 0 18px; }
+  .logos ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+  .logos li { display: grid; place-items: center; height: 76px; padding: 12px 16px; background: #fff; border: 1px solid var(--line); border-radius: 8px; }
+  .logos img { display: block; max-width: 100%; max-height: 46px; width: auto; height: auto; object-fit: contain; }
+  .logos .lnote { margin: 14px 0 0; font-size: 13px; color: var(--muted); }
+  @media (max-width: 960px) { .logos ul { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (max-width: 720px) { .logos ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .logos li { height: 68px; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<script src="brand.js"></script>
+
+
+
+<main>
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">השוואת ביטוחי רכב</div>
+        <h1>כל ביטוחי הרכב שלך, במקום אחד</h1>
+        <p class="lead">Rivo מרכזת את הפוליסות מהר הביטוח, מראה אילו כיסויים יש לכם ומתי הם מסתיימים, ומשווה הצעות מעשר חברות הביטוח הגדולות, בלי למלא את אותם פרטים שוב ושוב.</p>
+        <div class="cta">
+          <a class="btn" href="home.html" data-source="excel">העלאת קובץ מהר הביטוח</a>
+          <a class="btn ghost" href="index.html" data-source="api">התחברות דרך API</a>
+        </div>
+        <div class="note">הנתונים נשארים בדפדפן שלך בגרסה הנוכחית</div>
+      </div>
+
+      <div class="shot" role="img" aria-label="דוגמה למסך: רכב עם התראת פקיעה והצעה חלופית מהראל">
+        <div class="card">
+          <div class="row"><div class="car">מאזדה CX-5 EXECUTIVE 2.0</div><div class="plate">33445566</div></div>
+          <div class="row"><div class="sub">ביטוח רכב מקיף · הפניקס</div><div class="price">₪360 <small>/ חודש</small></div></div>
+          <div><div class="dates"><span>01/10/2025</span><span>01/10/2026</span></div><div class="bar"><i></i></div></div>
+          <div class="alert">ביטוח החובה והמקיף מסתיימים בעוד 11 ימים.</div>
+          <hr>
+          <div class="alt-l">הצעה חלופית</div>
+          <div class="alt"><div><b>הראל</b><span>חיסכון של ₪1,100 בשנה</span></div><div class="p">₪3,220</div></div>
+          <div class="demo">נתוני דוגמה</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps" id="steps">
+    <div class="wrap">
+      <h2 class="sec">שלושה שלבים, בלי טפסים חוזרים</h2>
+      <div class="cols3">
+        <div class="step"><div class="n">01</div><h3>מביאים את הנתונים</h3><p>מעלים קובץ אקסל שיוצא מהר הביטוח, או מתחברים דרך ממשק ה-API עם תעודת זהות וקוד חד-פעמי.</p></div>
+        <div class="step"><div class="n">02</div><h3>רואים תמונה מלאה</h3><p>כל הרכבים והפוליסות במסך אחד: כיסויים, השתתפות עצמית, תוקף והתראות על פוליסה שעומדת להסתיים.</p></div>
+        <div class="step"><div class="n">03</div><h3>משווים ומזמינים</h3><p>עונים על כמה שאלות, מקבלים הצעות מעשר חברות ביטוח גדולות ובוחרים כיסוי: חובה + צד ג׳ או חובה + מקיף.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="wrap">
+      <h2 class="sec">מה מקבלים</h2>
+      <div class="feats">
+        <div class="feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+          <div><h3>הביטוחים שלי: כל הרכבים במקום אחד</h3><p>פרמיה חודשית ושנתית, פוליסות פעילות ופוליסות שפגו, מקובצות לפי רכב.</p></div>
+        </div>
+        <div class="feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <div><h3>התראות בזמן</h3><p>פוליסה שמסתיימת בקרוב, או רכב בלי כיסוי מקיף, מסומנים ברגע שהנתונים נטענים.</p></div>
+        </div>
+        <div class="feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h11"/><path d="M4 17h11"/><circle cx="18" cy="7" r="2.5"/><circle cx="18" cy="17" r="2.5"/></svg>
+          <div><h3>השוואה שקופה</h3><p>לכל הצעה אפשר לפתוח את פרטי הפוליסה: השתתפות עצמית, שירותי דרך, רכב חלופי ועוד.</p></div>
+        </div>
+        <div class="feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 15l2 2 4-4"/></svg>
+          <div><h3>בקשת הצעה במקום אחד</h3><p>משלימים פרטים חסרים פעם אחת, עם אפשרות לתפיסת מסגרת בכרטיס אשראי בלי חיוב מיידי.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cos" aria-labelledby="cosH">
+    <div class="wrap">
+      <div class="lbl" id="cosH">משווים עבורכם הצעות מעשר חברות הביטוח הגדולות</div>
+      <ul>
+        <li>הפניקס</li><li>הראל</li><li>מגדל</li><li>כלל ביטוח</li><li>מנורה מבטחים</li><li>ביטוח ישיר</li><li>שירביט</li><li>הכשרה</li><li>AIG</li><li>איילון</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="logos" aria-labelledby="logosH">
+    <div class="wrap">
+      <h2 id="logosH">חברות הביטוח שמהן מתקבלות הצעות</h2>
+      <ul>
+        <li><img src="logos/phoenix.png" alt="הפניקס" loading="lazy"></li>
+        <li><img src="logos/harel.png" alt="הראל" loading="lazy"></li>
+        <li><img src="logos/migdal.png" alt="מגדל" loading="lazy"></li>
+        <li><img src="logos/clal.png" alt="כלל ביטוח" loading="lazy"></li>
+        <li><img src="logos/menora.png" alt="מנורה מבטחים" loading="lazy"></li>
+        <li><img src="logos/yashir.png" alt="ביטוח ישיר" loading="lazy"></li>
+        <li><img src="logos/shirbit.png" alt="שירביט" loading="lazy"></li>
+        <li><img src="logos/hachshara.png" alt="הכשרה" loading="lazy"></li>
+        <li><img src="logos/aig.png" alt="AIG" loading="lazy"></li>
+        <li><img src="logos/ayalon.png" alt="איילון" loading="lazy"></li>
+      </ul>
+      <p class="lnote">הלוגואים שייכים לחברות הביטוח ומוצגים להדגמה בלבד.</p>
+    </div>
+  </section>
+
+  <section class="faq" id="faq">
+    <div class="wrap">
+      <h2>שאלות נפוצות</h2>
+      <div>
+        <div class="q"><h3>מה ההבדל בין העלאת קובץ להתחברות דרך API?</h3><p>העלאת קובץ מתאימה כשכבר הורדתם ייצוא מהר הביטוח. ההתחברות דרך API מושכת את הפוליסות ישירות, אחרי זיהוי בתעודת זהות וקוד חד-פעמי.</p></div>
+        <div class="q"><h3>מה קורה לנתונים שלי?</h3><p>בגרסה הנוכחית הנתונים נשמרים בדפדפן בלבד לאורך הסשן, ופרטי כרטיס אשראי אינם נשמרים כלל.</p></div>
+        <div class="q"><h3>האם ההצעות אמיתיות?</h3><p>בגרסת ההדגמה ההצעות מדומות ונוצרות אוטומטית סביב הפרמיה הנוכחית. חיבור לתעריפים אמיתיים דורש שילוב עם חברות הביטוח.</p></div>
+        <div class="q"><h3>אילו סוגי כיסוי אפשר להשוות?</h3><p>חובה + צד ג׳, וחובה + מקיף. אפשר לעבור בין השניים בלחיצה ולקבל הצעות חדשות.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="start" id="start">
+    <div class="wrap">
+      <h2>מוכנים לראות את כל הפוליסות שלכם?</h2>
+      <div class="btns">
+        <a class="btn light" href="home.html" data-source="excel">העלאת קובץ אקסל</a>
+        <a class="btn outline" href="index.html" data-source="api">התחברות דרך API</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="brand" href="landing.html" aria-label="Rivo">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1f4e8c"/><path d="M11 23V9h6.5a4.5 4.5 0 0 1 0 9H11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 18l4 5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="23.5" cy="23.5" r="2.2" fill="#9fc0e6"/></svg>
+        <span>Rivo</span>
+      </a>
+      <p>בגרסת ההדגמה אין חיבור אמיתי להר הביטוח וההצעות מדומות. שמות החברות שייכים לבעליהם ומוצגים להמחשה בלבד.</p>
+    </div>
+    <nav aria-label="תחתית">
+      <a href="#steps">איך זה עובד</a>
+      <a href="#features">מה מקבלים</a>
+      <a href="#faq">שאלות נפוצות</a>
+      <a href="home.html">כניסה למערכת</a>
+      <a href="#" data-privacy-open>פרטיות</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+
+
+  // בחירה בכפתור "התחברות דרך API" מבטלת קובץ אקסל שהועלה קודם, כמו בדף הבית
+  document.querySelectorAll('a[data-source="api"]').forEach((a) => a.addEventListener("click", () => {
+    try { sessionStorage.setItem("harSource", "api"); sessionStorage.removeItem("harUpload"); } catch (e) {}
+  }));
+</script>
+<script src="privacy.js"></script>
+</body>
+</html>

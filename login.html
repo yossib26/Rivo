@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>כניסה למערכת</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="header.css">
+<script src="auth.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f3f5f8; --card: #ffffff; --ink: #1b2733; --muted: #5b6673; --line: #dfe4ea;
+    --accent: #1f4e8c; --accent-soft: #e8eef6; --hover: #173d6f; --crit: #a63a32; --crit-soft: #f8ebea; --ok: #2b6b4c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--ink); font-family: "Heebo", "Segoe UI", Arial, sans-serif; font-size: 15px; line-height: 1.5; }
+  main { flex: 1; display: grid; place-items: center; padding: 32px 16px; }
+  .box { width: min(440px, 100%); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 32px 32px 28px; }
+  h1 { margin: 0 0 4px; font-size: 26px; font-weight: 700; }
+  .sub { margin: 0 0 22px; color: var(--muted); }
+  .demo-note { margin: 0 0 18px; padding: 8px 14px; background: var(--bg); border-inline-start: 3px solid var(--accent); border-radius: 4px; font-size: 13.5px; }
+  button { font: inherit; cursor: pointer; }
+  .gbtn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 46px; padding: 10px 16px; background: #fff; color: var(--ink); border: 1px solid #b3bfcd; border-radius: 6px; font-weight: 600; }
+  .gbtn:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .gbtn .g { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #8794a4; display: grid; place-items: center; font-size: 13px; font-weight: 700; color: #4a5560; }
+  .or { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--muted); font-size: 13px; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  label.f { display: block; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .in { position: relative; margin-top: 4px; }
+  input[type=text], input[type=password], input[type=email] { width: 100%; padding: 11px 12px; font: inherit; font-size: 15px; color: var(--ink); background: #fff; border: 1px solid #b3bfcd; border-radius: 6px; }
+  input:focus { outline: 3px solid #cfdcee; border-color: var(--accent); }
+  input.ltr { direction: ltr; text-align: start; }
+  .in .eye { position: absolute; top: 0; bottom: 0; right: 0; width: 52px; background: none; border: 0; color: var(--muted); font-size: 13px; }
+  #p { padding-right: 56px; }
+  .row { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 16px; font-size: 14px; }
+  .row label { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); }
+  .primary { width: 100%; min-height: 46px; padding: 10px 16px; background: var(--accent); color: #fff; border: 1px solid var(--accent); border-radius: 6px; font-weight: 600; }
+  .primary:hover { background: var(--hover); }
+  .primary:disabled { opacity: .6; cursor: default; }
+  .err { min-height: 22px; margin: 0 0 8px; color: var(--crit); font-size: 13.5px; }
+  .demo { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .demo h2 { margin: 0 0 4px; font-size: 14px; }
+  .demo p { margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+  .acc { display: grid; gap: 8px; }
+  .acc button { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; padding: 9px 12px; text-align: start; background: #fff; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); }
+  .acc button:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .acc b { display: block; font-size: 14px; }
+  .acc small { color: var(--muted); }
+  .acc code { direction: ltr; unicode-bidi: isolate; font: 12.5px Consolas, "Courier New", monospace; color: #4a5560; text-align: end; }
+  a { color: var(--accent); }
+  .sms { margin: 0 0 16px; padding: 12px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; font-size: 14px; }
+  .sms .code { font-size: 22px; font-weight: 700; letter-spacing: 4px; color: var(--accent); direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  input.otp { letter-spacing: 8px; font-size: 22px; text-align: center; }
+  .links { display: flex; justify-content: space-between; margin-top: 14px; }
+  .lk { background: none; border: 0; padding: 4px 2px; color: var(--accent); text-decoration: underline; font-size: 14px; }
+  .lk:disabled { color: var(--muted); text-decoration: none; cursor: default; }
+  /* חלון בחירת חשבון Google (מדומה) */
+  dialog { width: min(400px, calc(100vw - 24px)); padding: 24px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); font: inherit; }
+  dialog::backdrop { background: rgba(20, 30, 45, .5); }
+  dialog h2 { margin: 0 0 2px; font-size: 20px; }
+  dialog .s { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+  .gl { list-style: none; margin: 0 0 8px; padding: 0; }
+  .gl button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 6px; background: none; border: 0; border-top: 1px solid var(--line); text-align: start; color: var(--ink); }
+  .gl li:last-child button { border-bottom: 1px solid var(--line); }
+  .gl button:hover { background: var(--accent-soft); }
+  .av { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 600; flex: none; }
+  .av.alt { background: #fff; color: var(--muted); border: 1.5px dashed #8794a4; }
+  .gl b { display: block; font-size: 14px; } .gl small { color: var(--muted); direction: ltr; unicode-bidi: isolate; }
+  .dnote { margin: 12px 0 0; font-size: 12.5px; color: var(--muted); }
+  .dclose { margin-top: 12px; background: none; border: 0; color: var(--accent); padding: 0; text-decoration: underline; }
+  @media (max-width: 480px) { .box { padding: 24px 18px 22px; } h1 { font-size: 22px; } .acc button { flex-direction: column; align-items: flex-start; gap: 2px; } .acc code { text-align: start; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<script src="brand.js"></script>
+
+
+<main>
+  <div class="box">
+    <div id="step1">
+    <h1>כניסה למערכת</h1>
+    <p class="sub">התחברו כדי לראות ולהשוות את פוליסות הרכב.</p>
+    <p class="demo-note" id="expiredNote" hidden>תוקף הכניסה פג. הכניסה נשמרת ל-30 דקות בלבד, ובלשונית הנוכחית בלבד. יש להתחבר מחדש.</p>
+    <p class="demo-note">מצב הדגמה · אין חיבור אמיתי ל-Google או לשרת. הסיסמאות ושמות המשתמש מוגדרים בדפדפן בלבד. כניסה בשם משתמש וסיסמה מחייבת קוד חד-פעמי (OTP). הכניסה תקפה ל-30 דקות, בלשונית הנוכחית בלבד.</p>
+
+    <button type="button" class="gbtn" id="google"><span class="g" aria-hidden="true">G</span>המשך עם חשבון Google</button>
+    <div class="or">או</div>
+
+    <form id="form" novalidate>
+      <label class="f">שם משתמש
+        <div class="in"><input id="u" type="text" class="ltr" autocomplete="username" autocapitalize="none" spellcheck="false"></div>
+      </label>
+      <label class="f">סיסמה
+        <div class="in"><input id="p" type="password" class="ltr" autocomplete="current-password"><button type="button" class="eye" id="eye" aria-label="הצגת הסיסמה">הצג</button></div>
+      </label>
+      <div class="err" id="err" role="alert"></div>
+      <button type="submit" class="primary" id="go">כניסה</button>
+    </form>
+
+    <section class="demo" aria-labelledby="dh">
+      <h2 id="dh">משתמשי הדגמה</h2>
+      <p>לחיצה על משתמש ממלאת את הפרטים בטופס. אחרי הסיסמה נשלח קוד חד-פעמי לטלפון של המשתמש.</p>
+      <div class="acc" id="acc"></div>
+    </section>
+    </div>
+
+    <div id="step2" hidden>
+      <h1>אימות בקוד חד-פעמי</h1>
+      <p class="sub" id="otpSub"></p>
+      <div class="sms" role="status" id="sms"></div>
+      <form id="otpForm" novalidate>
+        <label class="f">קוד OTP
+          <div class="in"><input id="otp" type="text" class="ltr otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••"></div>
+        </label>
+        <div class="err" id="otpErr" role="alert"></div>
+        <button type="submit" class="primary" id="otpGo">אימות וכניסה</button>
+      </form>
+      <div class="links"><button type="button" class="lk" id="resend" disabled>שליחה מחדש</button><button type="button" class="lk" id="back">חזרה</button></div>
+    </div>
+  </div>
+</main>
+
+<dialog id="gdlg" aria-labelledby="gt">
+  <h2 id="gt">בחירת חשבון</h2>
+  <p class="s">להמשך אל Rivo · הדגמה</p>
+  <ul class="gl" id="gl"></ul>
+  <form id="gother" hidden novalidate>
+    <label class="f" style="margin:0 0 10px">כתובת דוא״ל<div class="in"><input id="gmail" type="email" class="ltr" autocomplete="off" placeholder="name@example.com"></div></label>
+    <div class="err" id="gerr" role="alert"></div>
+    <button type="submit" class="primary">המשך</button>
+  </form>
+  <p class="dnote">הדגמה בלבד: החשבונות מדומים ולא נשלח דבר ל-Google.</p>
+  <button type="button" class="dclose" id="gclose">ביטול</button>
+</dialog>
+
+<script>
+  const $ = (s) => document.querySelector(s);
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const next = RivoAuth.safeNext(new URLSearchParams(location.search).get("next") || "home.html");
+  const initials = (n) => (n || "?").trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("");
+  const go = (u) => { RivoAuth.login(u); location.replace(next); };
+
+  if (RivoAuth.user()) location.replace(next); // כבר מחובר
+  else if (new URLSearchParams(location.search).get("expired") || RivoAuth.wasExpired()) $("#expiredNote").hidden = false;
+
+  // משתמשי הדגמה
+  $("#acc").innerHTML = RivoAuth.USERS.map((u) => `<button type="button" data-u="${esc(u.username)}"><span><b>${esc(u.name)}</b><small>${esc(u.role)}</small></span><code>${esc(u.username)} / ${esc(u.password)}</code></button>`).join("");
+  $("#acc").onclick = (e) => {
+    const b = e.target.closest("button[data-u]"); if (!b) return;
+    const u = RivoAuth.USERS.find((x) => x.username === b.dataset.u);
+    $("#u").value = u.username; $("#p").value = u.password; $("#err").textContent = ""; $("#go").focus();
+  };
+  $("#u").value = RivoAuth.USERS[1].username; $("#p").value = RivoAuth.USERS[1].password; // ברירת מחדל להדגמה
+
+  $("#eye").onclick = () => { const p = $("#p"), show = p.type === "password"; p.type = show ? "text" : "password"; $("#eye").textContent = show ? "הסתר" : "הצג"; $("#eye").setAttribute("aria-label", show ? "הסתרת הסיסמה" : "הצגת הסיסמה"); };
+
+  // כניסה בשם משתמש וסיסמה
+  let lockTimer;
+  function showLock() {
+    clearInterval(lockTimer);
+    const tick = () => {
+      const s = RivoAuth.lockedFor();
+      if (s <= 0) { clearInterval(lockTimer); $("#go").disabled = false; $("#err").textContent = ""; return; }
+      $("#go").disabled = true; $("#err").textContent = `יותר מדי ניסיונות. אפשר לנסות שוב בעוד ${s} שניות.`;
+    };
+    tick(); lockTimer = setInterval(tick, 500);
+  }
+  $("#form").onsubmit = async (e) => {
+    e.preventDefault();
+    const u = $("#u").value, p = $("#p").value;
+    if (!u.trim() || !p) return ($("#err").textContent = "יש להזין שם משתמש וסיסמה.");
+    $("#go").disabled = true; $("#go").textContent = "מתחבר…";
+    await new Promise((r) => setTimeout(r, 500));
+    const r = RivoAuth.tryPassword(u, p);
+    $("#go").textContent = "כניסה";
+    if (r.ok) return showOtp(r.user);
+    $("#go").disabled = false;
+    if (r.locked) return showLock();
+    $("#err").textContent = `שם משתמש או סיסמה שגויים. נותרו ${r.left} ניסיונות.`; $("#p").select();
+  };
+  if (RivoAuth.lockedFor() > 0) showLock();
+
+  // שלב שני: קוד חד-פעמי אחרי סיסמה נכונה
+  let resendTimer, sentAt = 0, pendingUser = null;
+  const mask = (ph) => (ph ? `${ph.slice(0, 3)}-***-${ph.slice(-4)}` : "המספר הרשום בחשבון");
+  function typeCode(code) { // הקוד מוקלד לשדה אוטומטית, כמו השלמת SMS
+    const input = $("#otp"); let i = 0;
+    setTimeout(function step() {
+      if (!input.isConnected || input.value !== code.slice(0, i)) return; // המשתמש התחיל להקליד
+      if (i === code.length) return void $("#otpGo").focus();
+      input.value = code.slice(0, ++i); setTimeout(step, 90);
+    }, 900);
+  }
+  function sendCode() {
+    const { code, phone } = RivoAuth.startOtp(pendingUser); sentAt = Date.now();
+    $("#otpSub").textContent = `שלחנו קוד בן 6 ספרות אל ${mask(phone)}.`;
+    $("#sms").innerHTML = `<b>הודעת SMS מדומה</b><br>קוד האימות שלך ל-Rivo: <span class="code">${esc(code)}</span>`;
+    $("#otp").value = ""; $("#otpErr").textContent = ""; $("#otpGo").disabled = false;
+    clearInterval(resendTimer);
+    const tick = () => {
+      const left = Math.max(0, 30 - Math.floor((Date.now() - sentAt) / 1000));
+      $("#resend").textContent = left ? `שליחה מחדש (${left})` : "שליחה מחדש"; $("#resend").disabled = left > 0;
+      if (!left) clearInterval(resendTimer);
+    };
+    tick(); resendTimer = setInterval(tick, 1000);
+    typeCode(code);
+  }
+  function showOtp(user) {
+    pendingUser = user;
+    $("#step1").hidden = true; $("#step2").hidden = false;
+    sendCode(); $("#otp").focus();
+  }
+  $("#otp").oninput = (e) => (e.target.value = e.target.value.replace(/\D/g, ""));
+  $("#resend").onclick = () => sendCode();
+  $("#back").onclick = () => { RivoAuth.cancelOtp(); clearInterval(resendTimer); $("#step2").hidden = true; $("#step1").hidden = false; $("#p").focus(); };
+  $("#otpForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const v = $("#otp").value.trim();
+    if (v.length !== 6) return ($("#otpErr").textContent = "קוד OTP מורכב מ-6 ספרות.");
+    $("#otpGo").disabled = true; $("#otpGo").textContent = "מאמת…";
+    await new Promise((r) => setTimeout(r, 500));
+    const r = RivoAuth.verifyOtp(v);
+    $("#otpGo").textContent = "אימות וכניסה";
+    if (r.ok) { clearInterval(resendTimer); return go(r.user); }
+    if (r.reason === "wrong") { $("#otpGo").disabled = false; $("#otp").value = ""; $("#otp").focus(); return ($("#otpErr").textContent = `קוד שגוי. נותרו ${r.left} ניסיונות.`); }
+    sendCode(); $("#otpErr").textContent = r.reason === "locked" ? "3 ניסיונות שגויים. נשלח קוד חדש." : "הקוד פג תוקף. נשלח קוד חדש.";
+  };
+
+  // כניסה עם Google (מדומה): בחירת חשבון
+  const dlg = $("#gdlg");
+  $("#google").onclick = () => {
+    $("#gother").hidden = true; $("#gl").hidden = false; $("#gerr").textContent = "";
+    $("#gl").innerHTML = RivoAuth.GOOGLE_ACCOUNTS.map((a, i) => `<li><button type="button" data-i="${i}"><span class="av">${esc(initials(a.name))}</span><span><b>${esc(a.name)}</b><small>${esc(a.email)}</small></span></button></li>`).join("")
+      + `<li><button type="button" data-other><span class="av alt" aria-hidden="true">+</span><span><b>שימוש בחשבון אחר</b></span></button></li>`;
+    dlg.showModal();
+  };
+  $("#gclose").onclick = () => dlg.close();
+  $("#gl").onclick = async (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.hasAttribute("data-other")) { $("#gl").hidden = true; $("#gother").hidden = false; $("#gmail").focus(); return; }
+    const acc = RivoAuth.GOOGLE_ACCOUNTS[+b.dataset.i];
+    b.innerHTML = `<span class="av">${esc(initials(acc.name))}</span><span><b>מתחברים…</b></span>`;
+    await new Promise((r) => setTimeout(r, 600));
+    go(RivoAuth.googleUser(acc));
+  };
+  $("#gother").onsubmit = async (e) => {
+    e.preventDefault();
+    const m = $("#gmail").value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m)) return ($("#gerr").textContent = "כתובת דוא״ל לא תקינה.");
+    await new Promise((r) => setTimeout(r, 500));
+    go(RivoAuth.googleUser({ email: m }));
+  };
+</script>
+<script src="privacy.js"></script>
+</body>
+</html>

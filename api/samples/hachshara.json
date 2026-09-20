@@ -1,0 +1,166 @@
+{
+  "company": "הכשרה",
+  "note": "דוגמה שנוצרה מקוד ההדגמה: בקשה ותגובה להצעה, ותגובת סירוב.",
+  "quote": {
+    "request": {
+      "method": "POST",
+      "url": "https://services.hcsra-online.example/soap-json/MotorQuote",
+      "headers": {
+        "Accept": "application/json",
+        "X-Hachshara-Auth": "demo-hcsra-a91c33",
+        "SOAPAction": "GetMotorQuote",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-95f1f92a"
+      },
+      "body": {
+        "Header": {
+          "MessageId": "RQ-95f1f92a",
+          "Timestamp": "2026-09-20T19:16:44.189Z",
+          "Version": "1.4"
+        },
+        "Body": {
+          "RequestId": "RQ-95f1f92a",
+          "StartDate": "2026-10-01",
+          "CustomerIdNumber": "012345678",
+          "CustomerFirstName": "אלכס",
+          "CustomerLastName": "כהן",
+          "CustomerPhone": "0548765432",
+          "CustomerAge": 43,
+          "VehiclePlate": "33445566",
+          "VehicleManufacturer": "מאזדה",
+          "VehicleModel": "CX-5 EXECUTIVE 2.0",
+          "VehicleYear": 2021,
+          "VehicleEngine": "GASOLINE",
+          "DriverLicenceYears": 26,
+          "DriverYoungestAge": 30,
+          "DriverCount": 2,
+          "DriverWhoDrives": "named",
+          "DriverClaimsCount": 0,
+          "DriverAtFault": "N",
+          "DriverPriorCancellation": "N",
+          "DriverConvictions": "N",
+          "UsageType": "private",
+          "UsageMileage": "10-20",
+          "UsageParking": "private",
+          "UsageSecurity": "N",
+          "CoverageKind": "comprehensive",
+          "CoverageDeductiblePref": "std",
+          "PriorInsurer": "הפניקס",
+          "PriorPolicyNumber": "MOT-2025-8812",
+          "PriorAnnualPremiumNis": 4320,
+          "PriorKind": "comprehensive",
+          "PriorDeductibleNis": 1450,
+          "PriorSumInsuredNis": 118000
+        }
+      }
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "463"
+      },
+      "body": {
+        "Header": {
+          "MessageId": "RQ-95f1f92a",
+          "Timestamp": "2026-09-20T19:16:44.189Z",
+          "Version": "1.4",
+          "ResultCode": "0"
+        },
+        "Body": {
+          "QuoteId": "HACHSHARA-9FE905B0",
+          "Kind": "comprehensive",
+          "PremiumAnnual": 3880,
+          "PremiumMonthly": 323,
+          "Installments": 6,
+          "Deductible": 1400,
+          "SumInsured": 118000,
+          "ThirdPartyLimit": 1000000,
+          "RoadAssist": "Y",
+          "ReplacementDays": 14,
+          "GlassIncluded": "Y",
+          "GlassDeductible": 250,
+          "BatteryLimit": null,
+          "ChargerLimit": null,
+          "YoungDriver": "none",
+          "ValidUntil": "2026-10-04"
+        }
+      }
+    }
+  },
+  "declined": {
+    "request": {
+      "method": "POST",
+      "url": "https://services.hcsra-online.example/soap-json/MotorQuote",
+      "headers": {
+        "Accept": "application/json",
+        "X-Hachshara-Auth": "demo-hcsra-a91c33",
+        "SOAPAction": "GetMotorQuote",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-964bceea"
+      },
+      "body": {
+        "Header": {
+          "MessageId": "RQ-964bceea",
+          "Timestamp": "2026-09-20T19:16:44.753Z",
+          "Version": "1.4"
+        },
+        "Body": {
+          "RequestId": "RQ-964bceea",
+          "StartDate": "2026-10-01",
+          "CustomerIdNumber": "012345678",
+          "CustomerFirstName": "אלכס",
+          "CustomerLastName": "כהן",
+          "CustomerPhone": "0548765432",
+          "CustomerAge": 43,
+          "VehiclePlate": "33445566",
+          "VehicleManufacturer": "מאזדה",
+          "VehicleModel": "CX-5 EXECUTIVE 2.0",
+          "VehicleYear": 2021,
+          "VehicleEngine": "GASOLINE",
+          "DriverLicenceYears": 1,
+          "DriverYoungestAge": 17,
+          "DriverCount": 2,
+          "DriverWhoDrives": "named",
+          "DriverClaimsCount": 3,
+          "DriverAtFault": "Y",
+          "DriverPriorCancellation": "Y",
+          "DriverConvictions": "Y",
+          "UsageType": "business",
+          "UsageMileage": "gt30",
+          "UsageParking": "private",
+          "UsageSecurity": "N",
+          "CoverageKind": "third",
+          "CoverageDeductiblePref": "std",
+          "PriorInsurer": "הפניקס",
+          "PriorPolicyNumber": "MOT-2025-8812",
+          "PriorAnnualPremiumNis": 4320,
+          "PriorKind": "comprehensive",
+          "PriorDeductibleNis": 1450,
+          "PriorSumInsuredNis": 118000
+        }
+      }
+    },
+    "response": {
+      "status": 422,
+      "statusText": "Unprocessable Entity",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "140"
+      },
+      "body": {
+        "Header": {
+          "ResultCode": "422",
+          "Version": "1.4"
+        },
+        "Errors": [
+          {
+            "Code": "PRIOR_CANCELLATION",
+            "Text": "previous refusal or cancellation on record"
+          }
+        ]
+      }
+    }
+  }
+}

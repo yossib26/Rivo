@@ -1,0 +1,177 @@
+{
+  "company": "איילון",
+  "note": "דוגמה שנוצרה מקוד ההדגמה: בקשה ותגובה להצעה, ותגובת סירוב.",
+  "quote": {
+    "request": {
+      "method": "POST",
+      "url": "https://api.ayalon-partners.example/motor/quote/calculate",
+      "headers": {
+        "Accept": "application/json",
+        "X-Ayalon-Key": "demo-ayalon-b47d20",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-95f1f92a"
+      },
+      "body": {
+        "request": {
+          "requestId": "RQ-95f1f92a",
+          "startDate": "2026-10-01",
+          "customer": {
+            "idNumber": "012345678",
+            "firstName": "אלכס",
+            "lastName": "כהן",
+            "phone": "0548765432",
+            "age": 43
+          },
+          "vehicle": {
+            "plate": "33445566",
+            "manufacturer": "מאזדה",
+            "model": "CX-5 EXECUTIVE 2.0",
+            "year": 2021,
+            "engine": "GASOLINE"
+          },
+          "driver": {
+            "licenceYears": 26,
+            "youngestAge": 30,
+            "count": 2,
+            "whoDrives": "named",
+            "claimsCount": 0,
+            "atFault": false,
+            "priorCancellation": false,
+            "convictions": false
+          },
+          "usage": {
+            "type": "private",
+            "mileage": "10-20",
+            "parking": "private",
+            "security": false
+          },
+          "coverage": {
+            "kind": "comprehensive",
+            "deductiblePref": "std"
+          },
+          "prior": {
+            "insurer": "הפניקס",
+            "policyNumber": "MOT-2025-8812",
+            "annualPremiumNis": 4320,
+            "kind": "comprehensive",
+            "deductibleNis": 1450,
+            "sumInsuredNis": 118000
+          }
+        }
+      }
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "372"
+      },
+      "body": {
+        "results": [
+          {
+            "quoteId": "AYALON-197F7C51",
+            "kind": "comprehensive",
+            "pricing": {
+              "annual": 3910,
+              "monthly": 326,
+              "installments": 6
+            },
+            "terms": {
+              "deductible": 1550,
+              "sumInsured": 118000,
+              "thirdPartyLimit": 2000000,
+              "roadAssist": true,
+              "replacementDays": 0,
+              "glass": {
+                "included": true,
+                "deductible": 400
+              },
+              "ev": {
+                "battery": null,
+                "charger": null
+              }
+            },
+            "youngDriver": "none",
+            "validUntil": "2026-10-04"
+          }
+        ],
+        "count": 1
+      }
+    }
+  },
+  "declined": {
+    "request": {
+      "method": "POST",
+      "url": "https://api.ayalon-partners.example/motor/quote/calculate",
+      "headers": {
+        "Accept": "application/json",
+        "X-Ayalon-Key": "demo-ayalon-b47d20",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-964bceea"
+      },
+      "body": {
+        "request": {
+          "requestId": "RQ-964bceea",
+          "startDate": "2026-10-01",
+          "customer": {
+            "idNumber": "012345678",
+            "firstName": "אלכס",
+            "lastName": "כהן",
+            "phone": "0548765432",
+            "age": 43
+          },
+          "vehicle": {
+            "plate": "33445566",
+            "manufacturer": "מאזדה",
+            "model": "CX-5 EXECUTIVE 2.0",
+            "year": 2021,
+            "engine": "GASOLINE"
+          },
+          "driver": {
+            "licenceYears": 1,
+            "youngestAge": 17,
+            "count": 2,
+            "whoDrives": "named",
+            "claimsCount": 3,
+            "atFault": true,
+            "priorCancellation": true,
+            "convictions": true
+          },
+          "usage": {
+            "type": "business",
+            "mileage": "gt30",
+            "parking": "private",
+            "security": false
+          },
+          "coverage": {
+            "kind": "third",
+            "deductiblePref": "std"
+          },
+          "prior": {
+            "insurer": "הפניקס",
+            "policyNumber": "MOT-2025-8812",
+            "annualPremiumNis": 4320,
+            "kind": "comprehensive",
+            "deductibleNis": 1450,
+            "sumInsuredNis": 118000
+          }
+        }
+      }
+    },
+    "response": {
+      "status": 422,
+      "statusText": "Unprocessable Entity",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "98"
+      },
+      "body": {
+        "results": [],
+        "count": 0,
+        "reasonCode": "HIGH_MILEAGE",
+        "reasonText": "annual mileage above 30,000 km"
+      }
+    }
+  }
+}

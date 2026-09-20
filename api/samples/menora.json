@@ -1,0 +1,182 @@
+{
+  "company": "מנורה מבטחים",
+  "note": "דוגמה שנוצרה מקוד ההדגמה: בקשה ותגובה להצעה, ותגובת סירוב.",
+  "quote": {
+    "request": {
+      "method": "POST",
+      "url": "https://gw.menora-partners.example/v1/vehicle-quotes",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer demo-menora-5b8e19",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-95f1f92a"
+      },
+      "body": {
+        "data": {
+          "attributes": {
+            "requestId": "RQ-95f1f92a",
+            "startDate": "2026-10-01",
+            "customer": {
+              "idNumber": "012345678",
+              "firstName": "אלכס",
+              "lastName": "כהן",
+              "phone": "0548765432",
+              "age": 43
+            },
+            "vehicle": {
+              "plate": "33445566",
+              "manufacturer": "מאזדה",
+              "model": "CX-5 EXECUTIVE 2.0",
+              "year": 2021,
+              "engine": "GASOLINE"
+            },
+            "driver": {
+              "licenceYears": 26,
+              "youngestAge": 30,
+              "count": 2,
+              "whoDrives": "named",
+              "claimsCount": 0,
+              "atFault": false,
+              "priorCancellation": false,
+              "convictions": false
+            },
+            "usage": {
+              "type": "PRIVATE",
+              "mileage": "10-20",
+              "parking": "private",
+              "security": false
+            },
+            "coverage": {
+              "kind": "comprehensive",
+              "deductiblePref": "std"
+            },
+            "prior": {
+              "insurer": "הפניקס",
+              "policyNumber": "MOT-2025-8812",
+              "annualPremiumNis": 4320,
+              "kind": "comprehensive",
+              "deductibleNis": 1450,
+              "sumInsuredNis": 118000
+            }
+          },
+          "type": "vehicleQuoteRequest"
+        }
+      }
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "501"
+      },
+      "body": {
+        "data": {
+          "attributes": {
+            "quoteId": "MENORA-84718D17",
+            "kind": "comprehensive",
+            "premiumAnnual": 4290,
+            "premiumMonthly": 358,
+            "installments": 6,
+            "deductible": 1500,
+            "sumInsured": 118000,
+            "thirdPartyLimit": 1000000,
+            "roadAssist": true,
+            "replacementDays": 14,
+            "glassIncluded": true,
+            "glassDeductible": 250,
+            "batteryLimit": null,
+            "chargerLimit": null,
+            "youngDriver": "none",
+            "validUntil": "2026-10-04"
+          },
+          "type": "vehicleQuote",
+          "id": "MENORA-84718D17"
+        },
+        "links": {
+          "self": "https://gw.menora-partners.example/v1/vehicle-quotes/MENORA-84718D17"
+        }
+      }
+    }
+  },
+  "declined": {
+    "request": {
+      "method": "POST",
+      "url": "https://gw.menora-partners.example/v1/vehicle-quotes",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer demo-menora-5b8e19",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-964bceea"
+      },
+      "body": {
+        "data": {
+          "attributes": {
+            "requestId": "RQ-964bceea",
+            "startDate": "2026-10-01",
+            "customer": {
+              "idNumber": "012345678",
+              "firstName": "אלכס",
+              "lastName": "כהן",
+              "phone": "0548765432",
+              "age": 43
+            },
+            "vehicle": {
+              "plate": "33445566",
+              "manufacturer": "מאזדה",
+              "model": "CX-5 EXECUTIVE 2.0",
+              "year": 2021,
+              "engine": "GASOLINE"
+            },
+            "driver": {
+              "licenceYears": 1,
+              "youngestAge": 17,
+              "count": 2,
+              "whoDrives": "named",
+              "claimsCount": 3,
+              "atFault": true,
+              "priorCancellation": true,
+              "convictions": true
+            },
+            "usage": {
+              "type": "BUSINESS_MIXED",
+              "mileage": "gt30",
+              "parking": "private",
+              "security": false
+            },
+            "coverage": {
+              "kind": "third",
+              "deductiblePref": "std"
+            },
+            "prior": {
+              "insurer": "הפניקס",
+              "policyNumber": "MOT-2025-8812",
+              "annualPremiumNis": 4320,
+              "kind": "comprehensive",
+              "deductibleNis": 1450,
+              "sumInsuredNis": 118000
+            }
+          },
+          "type": "vehicleQuoteRequest"
+        }
+      }
+    },
+    "response": {
+      "status": 422,
+      "statusText": "Unprocessable Entity",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "99"
+      },
+      "body": {
+        "errors": [
+          {
+            "status": "422",
+            "code": "YOUNG_DRIVER_NOT_ACCEPTED",
+            "title": "youngest driver under 19"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+/* עיצוב ה-loader המעגלי (משותף ל-compare.html ול-loader.html) */
+.loader { max-width: 620px; margin: 24px auto; padding: 28px 24px 22px; text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: 6px; }
+.loader h1 { margin: 0; font-size: 22px; }
+.loader .lsub { margin: 6px 0 0; color: var(--muted); }
+
+.orbit { position: relative; width: min(100%, 440px); aspect-ratio: 1; margin: 14px auto 10px; container-type: inline-size; }
+.orbit svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.otrack { fill: none; stroke: var(--line); stroke-width: .4; stroke-dasharray: 1 1.6; }
+.ring-bg { fill: none; stroke: var(--line); stroke-width: 3; }
+.ring-fg { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: butt; transform: rotate(-90deg); transform-origin: 50% 50%; }
+.ocenter { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; pointer-events: none; }
+.opct { font-size: max(26px, 9cqw); font-weight: 700; font-variant-numeric: tabular-nums; direction: ltr; line-height: 1.1; }
+.ocap { margin-top: 4px; width: 30cqw; min-height: 2.6em; font-size: max(11px, 3cqw); color: var(--muted); line-height: 1.3; }
+
+.oi { position: absolute; width: 19%; height: 11.5%; transform: translate(-50%, -50%); transition: opacity .3s; }
+.oi.wait { opacity: .45; }
+.oi.done.no { opacity: .75; }
+.cicon { position: relative; width: 100%; height: 100%; border-radius: 6px; display: grid; place-items: center; background: #fff; border: 1px solid var(--line); }
+.cicon img { position: absolute; inset: 0; margin: auto; width: auto; height: auto; max-width: 80%; max-height: 72%; user-select: none; }
+.cfallback { font-size: max(16px, 5.2cqw); font-weight: 700; }
+.oi.load .cicon { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 1px; }
+.oi.load { z-index: 2; }
+.mark { position: absolute; inset-block-end: -5px; inset-inline-end: -5px; width: 20px; height: 20px; border-radius: 50%; background: var(--ok); color: #fff; font-size: 12px; display: none; place-items: center; border: 2px solid var(--card); }
+.oi.done .mark { display: grid; }
+.oi.done.no .mark { background: var(--muted); }
+.oi.done.cur .mark { background: var(--accent); }
+.oname { position: absolute; top: 100%; inset-inline: -30%; margin-top: 4px; font-size: max(10px, 2.6cqw); font-weight: 600; white-space: nowrap; text-align: center; }
+
+.lbar { height: 8px; background: var(--line); border-radius: 2px; overflow: hidden; direction: rtl; margin-top: 8px; }
+.lfill { height: 100%; width: 0; background: var(--accent); }
+.lmeta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13.5px; color: var(--muted); }
+.lpct { font-variant-numeric: tabular-nums; direction: ltr; }
+.llegend { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 16px; margin-top: 14px; font-size: 12px; color: var(--muted); }
+.llegend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-inline-end: 5px; }
+.llegend .yes { background: var(--ok); } .llegend .no { background: var(--muted); } .llegend .cur { background: var(--accent); }
+.lnote { margin-top: 12px; font-size: 12px; color: var(--muted); }
+
+@media (max-width: 520px) { .loader { padding: 22px 12px 18px; } .mark { width: 16px; height: 16px; font-size: 10px; } }
+
+/* מצב driven: התקדמות במדרגות, לכן מעברים חלקים */
+.loader.driven .oi { transition: left .7s ease, top .7s ease, opacity .3s; }
+.loader.driven .ring-fg { transition: stroke-dashoffset .7s ease; }
+.loader.driven .lfill { transition: width .7s ease; }
+
+/* מצב minimal: רק מעגל האייקונים, בלי כותרות, טקסטים, פס התקדמות ומקרא (הטקסט נשאר לקוראי מסך) */
+.loader.minimal { max-width: none; margin: 0; padding: 0; background: none; border: 0; box-shadow: none; }
+.loader.minimal h1, .loader.minimal .lsub, .loader.minimal .lbar, .loader.minimal .lmeta, .loader.minimal .llegend, .loader.minimal .lnote, .loader.minimal .oname { display: none; }
+.loader.minimal .ocenter { position: absolute; inset: auto; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.loader.minimal .orbit { width: min(100%, 460px); margin: 0 auto; background: #fff; border-radius: 50%; box-shadow: 0 10px 44px rgba(10, 20, 35, .35); }

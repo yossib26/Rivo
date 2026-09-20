@@ -1,0 +1,169 @@
+{
+  "company": "AIG",
+  "note": "דוגמה שנוצרה מקוד ההדגמה: בקשה ותגובה להצעה, ותגובת סירוב.",
+  "quote": {
+    "request": {
+      "method": "POST",
+      "url": "https://api.aig-il.example/auto/rating/v1/quote",
+      "headers": {
+        "Accept": "application/json",
+        "X-AIG-Client-Id": "demo-aig-il-2210",
+        "Authorization": "Bearer demo-aig-6c0f8e",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-95f1f92a"
+      },
+      "body": {
+        "REQUEST": {
+          "REQUEST_ID": "RQ-95f1f92a",
+          "START_DATE": "2026-10-01",
+          "CUSTOMER": {
+            "ID_NUMBER": "012345678",
+            "FIRST_NAME": "אלכס",
+            "LAST_NAME": "כהן",
+            "PHONE": "0548765432",
+            "AGE": 43
+          },
+          "VEHICLE": {
+            "PLATE": "33445566",
+            "MANUFACTURER": "מאזדה",
+            "MODEL": "CX-5 EXECUTIVE 2.0",
+            "YEAR": 2021,
+            "ENGINE": "GASOLINE"
+          },
+          "DRIVER": {
+            "LICENCE_YEARS": 26,
+            "YOUNGEST_AGE": 30,
+            "COUNT": 2,
+            "WHO_DRIVES": "NAMED",
+            "CLAIMS_COUNT": 0,
+            "AT_FAULT": "N",
+            "PRIOR_CANCELLATION": "N",
+            "CONVICTIONS": "N"
+          },
+          "USAGE": {
+            "TYPE": "PRIVATE",
+            "MILEAGE": "10-20",
+            "PARKING": "PRIVATE",
+            "SECURITY": "N"
+          },
+          "COVERAGE": {
+            "KIND": "COMPREHENSIVE",
+            "DEDUCTIBLE_PREF": "STD"
+          },
+          "PRIOR": {
+            "INSURER": "הפניקס",
+            "POLICY_NUMBER": "MOT-2025-8812",
+            "ANNUAL_PREMIUM_NIS": 4320,
+            "KIND": "COMPREHENSIVE",
+            "DEDUCTIBLE_NIS": 1450,
+            "SUM_INSURED_NIS": 118000
+          }
+        }
+      }
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "379"
+      },
+      "body": {
+        "QUOTE": {
+          "QUOTE_ID": "AIG-7E24ED26",
+          "KIND": "COMPREHENSIVE",
+          "PREMIUM_ANNUAL": 3780,
+          "PREMIUM_MONTHLY": 315,
+          "INSTALLMENTS": 6,
+          "DEDUCTIBLE": 1450,
+          "SUM_INSURED": 118000,
+          "THIRD_PARTY_LIMIT": 2000000,
+          "ROAD_ASSIST": "N",
+          "REPLACEMENT_DAYS": 7,
+          "GLASS_INCLUDED": "Y",
+          "GLASS_DEDUCTIBLE": 250,
+          "BATTERY_LIMIT": null,
+          "CHARGER_LIMIT": null,
+          "YOUNG_DRIVER": "NONE",
+          "VALID_UNTIL": "2026-10-04"
+        },
+        "CURRENCY": "ILS"
+      }
+    }
+  },
+  "declined": {
+    "request": {
+      "method": "POST",
+      "url": "https://api.aig-il.example/auto/rating/v1/quote",
+      "headers": {
+        "Accept": "application/json",
+        "X-AIG-Client-Id": "demo-aig-il-2210",
+        "Authorization": "Bearer demo-aig-6c0f8e",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-964bceea"
+      },
+      "body": {
+        "REQUEST": {
+          "REQUEST_ID": "RQ-964bceea",
+          "START_DATE": "2026-10-01",
+          "CUSTOMER": {
+            "ID_NUMBER": "012345678",
+            "FIRST_NAME": "אלכס",
+            "LAST_NAME": "כהן",
+            "PHONE": "0548765432",
+            "AGE": 43
+          },
+          "VEHICLE": {
+            "PLATE": "33445566",
+            "MANUFACTURER": "מאזדה",
+            "MODEL": "CX-5 EXECUTIVE 2.0",
+            "YEAR": 2021,
+            "ENGINE": "GASOLINE"
+          },
+          "DRIVER": {
+            "LICENCE_YEARS": 1,
+            "YOUNGEST_AGE": 17,
+            "COUNT": 2,
+            "WHO_DRIVES": "NAMED",
+            "CLAIMS_COUNT": 3,
+            "AT_FAULT": "Y",
+            "PRIOR_CANCELLATION": "Y",
+            "CONVICTIONS": "Y"
+          },
+          "USAGE": {
+            "TYPE": "BUSINESS",
+            "MILEAGE": "gt30",
+            "PARKING": "PRIVATE",
+            "SECURITY": "N"
+          },
+          "COVERAGE": {
+            "KIND": "THIRD",
+            "DEDUCTIBLE_PREF": "STD"
+          },
+          "PRIOR": {
+            "INSURER": "הפניקס",
+            "POLICY_NUMBER": "MOT-2025-8812",
+            "ANNUAL_PREMIUM_NIS": 4320,
+            "KIND": "COMPREHENSIVE",
+            "DEDUCTIBLE_NIS": 1450,
+            "SUM_INSURED_NIS": 118000
+          }
+        }
+      }
+    },
+    "response": {
+      "status": 422,
+      "statusText": "Unprocessable Entity",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "93"
+      },
+      "body": {
+        "FAULT": {
+          "CODE": "PRODUCT_NOT_OFFERED",
+          "DETAIL": "only comprehensive motor cover is offered"
+        }
+      }
+    }
+  }
+}

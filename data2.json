@@ -1,0 +1,303 @@
+{
+  "status": "SUCCESS",
+  "requestId": "req_99a82f11-002d-419a-a82f-11002da82f02",
+  "extractedAt": "2026-09-20T19:35:00Z",
+  "source": "HAR_HABITUCH_OFFICIAL",
+  "customer": {
+    "idNumber": "012345678",
+    "firstName": "אלכס",
+    "lastName": "כהן",
+    "birthDate": "1982-11-04",
+    "phone": "0548765432",
+    "email": "alex.cohen@example.co.il",
+    "drivingLicenceYear": 2000
+  },
+  "summary": {
+    "totalActivePolicies": 6,
+    "totalMonthlyPremiumNis": 1240.00,
+    "totalAnnualPremiumNis": 14880.00,
+    "motorCategorySummary": {
+      "activeVehiclesCount": 3,
+      "totalMotorMonthlyNis": 985.00,
+      "totalMotorAnnualNis": 11820.00
+    },
+    "detectedAlerts": [
+      {
+        "code": "MOTOR_EXPIRING_URGENT",
+        "severity": "CRITICAL",
+        "category": "MOTOR",
+        "relatedAssetId": "33445566",
+        "message": "ביטוח החובה והמקיף למאזדה CX-5 מסתיים בעוד 10 ימים (01/10/2026)."
+      },
+      {
+        "code": "MISSING_COMPREHENSIVE_COVERAGE",
+        "severity": "HIGH",
+        "category": "MOTOR",
+        "relatedAssetId": "99887766",
+        "message": "לרכב יונדאי i10 קיים ביטוח חובה וצד ג' בלבד - ללא כיסוי מקיף (נזק עצמי/גניבה)."
+      },
+      {
+        "code": "EV_BATTERY_COVERAGE_CHECK",
+        "severity": "INFO",
+        "category": "MOTOR",
+        "relatedAssetId": "11223344",
+        "message": "לרכב חשמלי (טסלה) מומלץ לוודא כיסוי ייעודי לסוללה ולעמדת טעינה."
+      }
+    ]
+  },
+  "policies": [
+    {
+      "policyId": "MOT-2025-8812",
+      "insuranceCompany": "הפניקס",
+      "companyCode": 55,
+      "category": "MOTOR",
+      "subCategory": "ביטוח רכב מקיף",
+      "status": "ACTIVE",
+      "startDate": "2025-10-01",
+      "endDate": "2026-10-01",
+      "premium": {
+        "monthlyNis": 360.00,
+        "annualNis": 4320.00,
+        "paymentMethod": "CREDIT_CARD",
+        "installmentsCount": 12
+      },
+      "assetDetails": {
+        "licensePlate": "33445566",
+        "vehicleManufacturer": "מאזדה",
+        "vehicleModel": "CX-5 EXECUTIVE 2.0",
+        "modelYear": 2021,
+        "carCode": "123088",
+        "engineType": "GASOLINE",
+        "ownershipType": "PRIVATE"
+      },
+      "driverSpecifications": {
+        "minDriverAge": 30,
+        "minLicenceYears": 5,
+        "isAnyDriver": false,
+        "namedDriversCount": 2
+      },
+      "coverages": [
+        {
+          "name": "נזק עצמי לרכב (תאונה/גניבה/שריפה)",
+          "isCovered": true,
+          "sumInsuredNis": 118000,
+          "deductibleNis": 1450
+        },
+        {
+          "name": "אחריות כלפי צד שלישי (צד ג')",
+          "isCovered": true,
+          "sumInsuredNis": 2000000,
+          "deductibleNis": 1200
+        },
+        {
+          "name": "שירותי דרך, גרירה ורכב חלופי",
+          "isCovered": true,
+          "sumInsuredNis": null
+        },
+        {
+          "name": "כיסוי שבר שמשיות ופנסים",
+          "isCovered": true,
+          "sumInsuredNis": null
+        }
+      ]
+    },
+    {
+      "policyId": "MOT-2025-8813",
+      "insuranceCompany": "הפניקס",
+      "companyCode": 55,
+      "category": "MOTOR",
+      "subCategory": "ביטוח רכב חובה",
+      "status": "ACTIVE",
+      "startDate": "2025-10-01",
+      "endDate": "2026-10-01",
+      "premium": {
+        "monthlyNis": 115.00,
+        "annualNis": 1380.00,
+        "paymentMethod": "CREDIT_CARD"
+      },
+      "assetDetails": {
+        "licensePlate": "33445566",
+        "vehicleManufacturer": "מאזדה",
+        "vehicleModel": "CX-5 EXECUTIVE 2.0",
+        "modelYear": 2021
+      },
+      "coverages": [
+        {
+          "name": "נזקי גוף (חוק פיצויים לנפגעי תאונות דרכים - פלת\"ד)",
+          "isCovered": true,
+          "sumInsuredNis": null
+        }
+      ]
+    },
+    {
+      "policyId": "MOT-EV-9901",
+      "insuranceCompany": "מנורה מבטחים",
+      "companyCode": 22,
+      "category": "MOTOR",
+      "subCategory": "ביטוח רכב מקיף + חובה (חבילה מורחבת לרכב חשמלי)",
+      "status": "ACTIVE",
+      "startDate": "2026-03-15",
+      "endDate": "2027-03-15",
+      "premium": {
+        "monthlyNis": 390.00,
+        "annualNis": 4680.00,
+        "paymentMethod": "DIRECT_DEBIT"
+      },
+      "assetDetails": {
+        "licensePlate": "11223344",
+        "vehicleManufacturer": "טסלה",
+        "vehicleModel": "MODEL 3 LONG RANGE AWD",
+        "modelYear": 2023,
+        "carCode": "882010",
+        "engineType": "ELECTRIC",
+        "ownershipType": "PRIVATE"
+      },
+      "driverSpecifications": {
+        "minDriverAge": 24,
+        "minLicenceYears": 2,
+        "isAnyDriver": true
+      },
+      "coverages": [
+        {
+          "name": "ביטוח חובה - נזקי גוף",
+          "isCovered": true,
+          "sumInsuredNis": null
+        },
+        {
+          "name": "מקיף - נזק עצמי וצד ג'",
+          "isCovered": true,
+          "sumInsuredNis": 185000
+        },
+        {
+          "name": "כיסוי ייעודי לסוללת רכב חשמלי",
+          "isCovered": true,
+          "sumInsuredNis": 60000
+        },
+        {
+          "name": "כיסוי נזק לעמדת טעינה ביתית וכבל טעינה",
+          "isCovered": true,
+          "sumInsuredNis": 15000
+        },
+        {
+          "name": "גרירה מיוחדת לרכב חשמלי (פריקה מלאה)",
+          "isCovered": true,
+          "sumInsuredNis": null
+        }
+      ]
+    },
+    {
+      "policyId": "MOT-3RD-4412",
+      "insuranceCompany": "ביטוח ישיר",
+      "companyCode": 9,
+      "category": "MOTOR",
+      "subCategory": "ביטוח רכב צד שלישי בלבד",
+      "status": "ACTIVE",
+      "startDate": "2026-01-01",
+      "endDate": "2027-01-01",
+      "premium": {
+        "monthlyNis": 70.00,
+        "annualNis": 840.00,
+        "paymentMethod": "CREDIT_CARD"
+      },
+      "assetDetails": {
+        "licensePlate": "99887766",
+        "vehicleManufacturer": "יונדאי",
+        "vehicleModel": "I10 INSIGHT 1.0",
+        "modelYear": 2016,
+        "carCode": "443012",
+        "engineType": "GASOLINE",
+        "ownershipType": "PRIVATE_YOUNG_DRIVER"
+      },
+      "driverSpecifications": {
+        "minDriverAge": 18,
+        "minLicenceYears": 0,
+        "isYoungDriverIncluded": true
+      },
+      "coverages": [
+        {
+          "name": "נזקי רכוש לצד שלישי",
+          "isCovered": true,
+          "sumInsuredNis": 1000000,
+          "deductibleNis": 1800
+        },
+        {
+          "name": "שירותי דרך וגרירה בסיסיים",
+          "isCovered": true,
+          "sumInsuredNis": null
+        }
+      ]
+    },
+    {
+      "policyId": "MOT-MAND-4413",
+      "insuranceCompany": "ביטוח ישיר",
+      "companyCode": 9,
+      "category": "MOTOR",
+      "subCategory": "ביטוח רכב חובה",
+      "status": "ACTIVE",
+      "startDate": "2026-01-01",
+      "endDate": "2027-01-01",
+      "premium": {
+        "monthlyNis": 50.00,
+        "annualNis": 600.00,
+        "paymentMethod": "CREDIT_CARD"
+      },
+      "assetDetails": {
+        "licensePlate": "99887766",
+        "vehicleManufacturer": "יונדאי",
+        "vehicleModel": "I10 INSIGHT 1.0",
+        "modelYear": 2016
+      },
+      "coverages": [
+        {
+          "name": "ביטוח חובה נזקי גוף (נהג צעיר)",
+          "isCovered": true,
+          "sumInsuredNis": null
+        }
+      ]
+    },
+    {
+      "policyId": "MOT-OLD-0092",
+      "insuranceCompany": "כלל ביטוח",
+      "companyCode": 44,
+      "category": "MOTOR",
+      "subCategory": "ביטוח רכב מקיף + חובה",
+      "status": "EXPIRED",
+      "startDate": "2024-09-01",
+      "endDate": "2025-09-01",
+      "premium": {
+        "monthlyNis": 310.00,
+        "annualNis": 3720.00,
+        "paymentMethod": "CREDIT_CARD"
+      },
+      "assetDetails": {
+        "licensePlate": "55667788",
+        "vehicleManufacturer": "טויוטה",
+        "vehicleModel": "קורולה SUN",
+        "modelYear": 2018,
+        "carCode": "301020"
+      },
+      "coverages": []
+    },
+    {
+      "policyId": "HLT-772109",
+      "insuranceCompany": "הראל",
+      "companyCode": 33,
+      "category": "HEALTH",
+      "subCategory": "ביטוח בריאות פרטי",
+      "status": "ACTIVE",
+      "startDate": "2022-05-01",
+      "endDate": "2027-05-01",
+      "premium": {
+        "monthlyNis": 255.00,
+        "paymentMethod": "CREDIT_CARD"
+      },
+      "coverages": [
+        {
+          "name": "ניתוחים והשתלות בחו\"ל",
+          "isCovered": true,
+          "sumInsuredNis": 3000000
+        }
+      ]
+    }
+  ]
+}

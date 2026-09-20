@@ -1,0 +1,139 @@
+{
+  "company": "שירביט",
+  "note": "דוגמה שנוצרה מקוד ההדגמה: בקשה ותגובה להצעה, ותגובת סירוב.",
+  "quote": {
+    "request": {
+      "method": "POST",
+      "url": "https://online.shirbit-ins.example/api/motor/offers",
+      "headers": {
+        "Accept": "application/json",
+        "X-Shirbit-Key": "demo-shirbit-02f6b8",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-95f1f92a"
+      },
+      "body": {
+        "requestId": "RQ-95f1f92a",
+        "startDate": "2026-10-01",
+        "customerIdNumber": "012345678",
+        "customerFirstName": "אלכס",
+        "customerLastName": "כהן",
+        "customerPhone": "0548765432",
+        "customerAge": 43,
+        "vehiclePlate": "33445566",
+        "vehicleManufacturer": "מאזדה",
+        "vehicleModel": "CX-5 EXECUTIVE 2.0",
+        "vehicleYear": 2021,
+        "vehicleEngine": "GASOLINE",
+        "driverLicenceYears": 26,
+        "driverYoungestAge": 30,
+        "driverCount": 2,
+        "driverWhoDrives": "named",
+        "driverClaimsCount": 0,
+        "driverAtFault": 0,
+        "driverPriorCancellation": 0,
+        "driverConvictions": 0,
+        "usageType": "private",
+        "usageMileage": "10-20",
+        "usageParking": "private",
+        "usageSecurity": 0,
+        "coverageKind": "comprehensive",
+        "coverageDeductiblePref": "std",
+        "priorInsurer": "הפניקס",
+        "priorPolicyNumber": "MOT-2025-8812",
+        "priorAnnualPremiumNis": 4320,
+        "priorKind": "comprehensive",
+        "priorDeductibleNis": 1450,
+        "priorSumInsuredNis": 118000
+      }
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "369"
+      },
+      "body": {
+        "offer": {
+          "quoteId": "SHIRBIT-B231D045",
+          "kind": "comprehensive",
+          "premiumAnnual": "3380",
+          "premiumMonthly": "282",
+          "installments": 12,
+          "deductible": "1450",
+          "sumInsured": "118000",
+          "thirdPartyLimit": "1000000",
+          "roadAssist": 1,
+          "replacementDays": 0,
+          "glassIncluded": 1,
+          "glassDeductible": "0",
+          "batteryLimit": null,
+          "chargerLimit": null,
+          "youngDriver": "none",
+          "validUntil": "2026-10-04"
+        },
+        "ok": true
+      }
+    }
+  },
+  "declined": {
+    "request": {
+      "method": "POST",
+      "url": "https://online.shirbit-ins.example/api/motor/offers",
+      "headers": {
+        "Accept": "application/json",
+        "X-Shirbit-Key": "demo-shirbit-02f6b8",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-964bceea"
+      },
+      "body": {
+        "requestId": "RQ-964bceea",
+        "startDate": "2026-10-01",
+        "customerIdNumber": "012345678",
+        "customerFirstName": "אלכס",
+        "customerLastName": "כהן",
+        "customerPhone": "0548765432",
+        "customerAge": 43,
+        "vehiclePlate": "33445566",
+        "vehicleManufacturer": "מאזדה",
+        "vehicleModel": "CX-5 EXECUTIVE 2.0",
+        "vehicleYear": 2021,
+        "vehicleEngine": "GASOLINE",
+        "driverLicenceYears": 1,
+        "driverYoungestAge": 17,
+        "driverCount": 2,
+        "driverWhoDrives": "named",
+        "driverClaimsCount": 3,
+        "driverAtFault": 1,
+        "driverPriorCancellation": 1,
+        "driverConvictions": 1,
+        "usageType": "business",
+        "usageMileage": "gt30",
+        "usageParking": "private",
+        "usageSecurity": 0,
+        "coverageKind": "third",
+        "coverageDeductiblePref": "std",
+        "priorInsurer": "הפניקס",
+        "priorPolicyNumber": "MOT-2025-8812",
+        "priorAnnualPremiumNis": 4320,
+        "priorKind": "comprehensive",
+        "priorDeductibleNis": 1450,
+        "priorSumInsuredNis": 118000
+      }
+    },
+    "response": {
+      "status": 422,
+      "statusText": "Unprocessable Entity",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "102"
+      },
+      "body": {
+        "ok": false,
+        "code": "YOUNG_DRIVER_NOT_ACCEPTED",
+        "message": "youngest driver under 21",
+        "retryable": false
+      }
+    }
+  }
+}

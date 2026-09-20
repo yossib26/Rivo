@@ -1,0 +1,199 @@
+{
+  "company": "הראל",
+  "note": "דוגמה שנוצרה מקוד ההדגמה: בקשה ותגובה להצעה, ותגובת סירוב.",
+  "quote": {
+    "request": {
+      "method": "POST",
+      "url": "https://api.harel.example/motor/v2/quotes",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer demo-harel-7d2e51",
+        "X-Api-Version": "2",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-95f1f92a"
+      },
+      "body": {
+        "quoteRequest": {
+          "requestId": "RQ-95f1f92a",
+          "startDate": "2026-10-01",
+          "insured": {
+            "nationalId": "012345678",
+            "givenName": "אלכס",
+            "familyName": "כהן"
+          },
+          "customer": {
+            "phone": "0548765432",
+            "age": 43
+          },
+          "vehicle": {
+            "plate": "33445566",
+            "manufacturer": "מאזדה",
+            "model": "CX-5 EXECUTIVE 2.0",
+            "year": 2021,
+            "engine": "GASOLINE"
+          },
+          "driver": {
+            "licenceYears": 26,
+            "youngestAge": 30,
+            "claimsCount": 0,
+            "atFault": false,
+            "priorCancellation": false,
+            "convictions": false
+          },
+          "drivers": {
+            "count": 2,
+            "scope": "NAMED_DRIVERS"
+          },
+          "usage": {
+            "type": "PRIVATE",
+            "mileage": "10-20",
+            "parking": "private",
+            "security": false
+          },
+          "coverage": {
+            "kind": "comprehensive",
+            "deductiblePref": "std"
+          },
+          "prior": {
+            "insurer": "הפניקס",
+            "policyNumber": "MOT-2025-8812",
+            "annualPremiumNis": 4320,
+            "kind": "comprehensive",
+            "deductibleNis": 1450,
+            "sumInsuredNis": 118000
+          }
+        }
+      }
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "478"
+      },
+      "body": {
+        "quote": {
+          "quoteId": "HAREL-09994EF2",
+          "kind": "comprehensive",
+          "premium": {
+            "annual": 3560,
+            "monthly": 297,
+            "maxInstallments": 10
+          },
+          "coverage": {
+            "ownDamage": {
+              "deductible": 1700,
+              "sumInsured": 118000
+            },
+            "thirdParty": {
+              "propertyLimit": 2000000
+            }
+          },
+          "services": {
+            "roadAssistance": false,
+            "replacementCarDays": 30,
+            "glass": {
+              "included": true,
+              "deductible": 250
+            }
+          },
+          "ev": {
+            "battery": {
+              "limit": null
+            },
+            "charger": {
+              "limit": null
+            }
+          },
+          "youngDriver": "none",
+          "validUntil": "2026-10-04"
+        },
+        "meta": {
+          "apiVersion": "2.1",
+          "currency": "ILS"
+        }
+      }
+    }
+  },
+  "declined": {
+    "request": {
+      "method": "POST",
+      "url": "https://api.harel.example/motor/v2/quotes",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer demo-harel-7d2e51",
+        "X-Api-Version": "2",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-964bceea"
+      },
+      "body": {
+        "quoteRequest": {
+          "requestId": "RQ-964bceea",
+          "startDate": "2026-10-01",
+          "insured": {
+            "nationalId": "012345678",
+            "givenName": "אלכס",
+            "familyName": "כהן"
+          },
+          "customer": {
+            "phone": "0548765432",
+            "age": 43
+          },
+          "vehicle": {
+            "plate": "33445566",
+            "manufacturer": "מאזדה",
+            "model": "CX-5 EXECUTIVE 2.0",
+            "year": 2021,
+            "engine": "GASOLINE"
+          },
+          "driver": {
+            "licenceYears": 1,
+            "youngestAge": 17,
+            "claimsCount": 3,
+            "atFault": true,
+            "priorCancellation": true,
+            "convictions": true
+          },
+          "drivers": {
+            "count": 2,
+            "scope": "NAMED_DRIVERS"
+          },
+          "usage": {
+            "type": "PRIVATE_AND_WORK",
+            "mileage": "gt30",
+            "parking": "private",
+            "security": false
+          },
+          "coverage": {
+            "kind": "third",
+            "deductiblePref": "std"
+          },
+          "prior": {
+            "insurer": "הפניקס",
+            "policyNumber": "MOT-2025-8812",
+            "annualPremiumNis": 4320,
+            "kind": "comprehensive",
+            "deductibleNis": 1450,
+            "sumInsuredNis": 118000
+          }
+        }
+      }
+    },
+    "response": {
+      "status": 422,
+      "statusText": "Unprocessable Entity",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "122"
+      },
+      "body": {
+        "error": {
+          "code": "PRIOR_CANCELLATION",
+          "message": "policy previously cancelled or refused by an insurer",
+          "retryable": false
+        }
+      }
+    }
+  }
+}

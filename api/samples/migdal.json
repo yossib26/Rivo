@@ -1,0 +1,170 @@
+{
+  "company": "מגדל",
+  "note": "דוגמה שנוצרה מקוד ההדגמה: בקשה ותגובה להצעה, ותגובת סירוב.",
+  "quote": {
+    "request": {
+      "method": "POST",
+      "url": "https://quotes.migdal-api.example/motor/QuoteService.svc/GetQuote",
+      "headers": {
+        "Accept": "application/json",
+        "Ocp-Apim-Subscription-Key": "demo-migdal-91ab0c",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-95f1f92a"
+      },
+      "body": {
+        "QuoteRequest": {
+          "RequestId": "RQ-95f1f92a",
+          "StartDate": "2026-10-01",
+          "Customer": {
+            "IdNumber": "012345678",
+            "FirstName": "אלכס",
+            "LastName": "כהן",
+            "Phone": "0548765432",
+            "Age": 43
+          },
+          "Vehicle": {
+            "Plate": "33445566",
+            "Manufacturer": "מאזדה",
+            "Model": "CX-5 EXECUTIVE 2.0",
+            "Year": "2021",
+            "Engine": "GASOLINE"
+          },
+          "Driver": {
+            "LicenceYears": 26,
+            "YoungestAge": 30,
+            "Count": 2,
+            "WhoDrives": "named",
+            "ClaimsCount": 0,
+            "AtFault": "N",
+            "PriorCancellation": "N",
+            "Convictions": "N"
+          },
+          "Usage": {
+            "Type": "private",
+            "Mileage": "10-20",
+            "Parking": "private",
+            "Security": "N"
+          },
+          "Coverage": {
+            "Kind": "comprehensive",
+            "DeductiblePref": "std"
+          },
+          "Prior": {
+            "Insurer": "הפניקס",
+            "PolicyNumber": "MOT-2025-8812",
+            "AnnualPremiumNis": "4,320.00",
+            "Kind": "comprehensive",
+            "DeductibleNis": "1,450.00",
+            "SumInsuredNis": "118,000.00"
+          }
+        }
+      }
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "417"
+      },
+      "body": {
+        "QuoteResult": {
+          "QuoteId": "MIGDAL-BE88A6FA",
+          "Kind": "comprehensive",
+          "PremiumAnnual": "4,200.00",
+          "PremiumMonthly": "350.00",
+          "Installments": "12",
+          "Deductible": "1,350.00",
+          "SumInsured": "118,000.00",
+          "ThirdPartyLimit": "2,000,000.00",
+          "RoadAssist": "Y",
+          "ReplacementDays": "14",
+          "GlassIncluded": "Y",
+          "GlassDeductible": "250.00",
+          "BatteryLimit": null,
+          "ChargerLimit": null,
+          "YoungDriver": "none",
+          "ValidUntil": "2026-10-04"
+        },
+        "Status": "Success"
+      }
+    }
+  },
+  "declined": {
+    "request": {
+      "method": "POST",
+      "url": "https://quotes.migdal-api.example/motor/QuoteService.svc/GetQuote",
+      "headers": {
+        "Accept": "application/json",
+        "Ocp-Apim-Subscription-Key": "demo-migdal-91ab0c",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-964bceea"
+      },
+      "body": {
+        "QuoteRequest": {
+          "RequestId": "RQ-964bceea",
+          "StartDate": "2026-10-01",
+          "Customer": {
+            "IdNumber": "012345678",
+            "FirstName": "אלכס",
+            "LastName": "כהן",
+            "Phone": "0548765432",
+            "Age": 43
+          },
+          "Vehicle": {
+            "Plate": "33445566",
+            "Manufacturer": "מאזדה",
+            "Model": "CX-5 EXECUTIVE 2.0",
+            "Year": "2021",
+            "Engine": "GASOLINE"
+          },
+          "Driver": {
+            "LicenceYears": 1,
+            "YoungestAge": 17,
+            "Count": 2,
+            "WhoDrives": "named",
+            "ClaimsCount": 3,
+            "AtFault": "Y",
+            "PriorCancellation": "Y",
+            "Convictions": "Y"
+          },
+          "Usage": {
+            "Type": "business",
+            "Mileage": "gt30",
+            "Parking": "private",
+            "Security": "N"
+          },
+          "Coverage": {
+            "Kind": "third",
+            "DeductiblePref": "std"
+          },
+          "Prior": {
+            "Insurer": "הפניקס",
+            "PolicyNumber": "MOT-2025-8812",
+            "AnnualPremiumNis": "4,320.00",
+            "Kind": "comprehensive",
+            "DeductibleNis": "1,450.00",
+            "SumInsuredNis": "118,000.00"
+          }
+        }
+      }
+    },
+    "response": {
+      "status": 422,
+      "statusText": "Unprocessable Entity",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "103"
+      },
+      "body": {
+        "Status": "Declined",
+        "Errors": [
+          {
+            "Code": "AT_FAULT_CLAIMS",
+            "Description": "two or more at-fault claims"
+          }
+        ]
+      }
+    }
+  }
+}

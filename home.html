@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="auth.js" data-require></script>
+<title>פוליסות רכב · בחירת מקור נתונים</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f5f4f0; --card: #ffffff; --ink: #1f2328; --muted: #666a70; --line: #dddad2;
+    --accent: #0f5a63; --accent-soft: #e8f0f0;
+    --ok: #1f6a44; --ok-soft: #e7f0ea; --warn: #8a5300; --crit: #a3312a; --crit-soft: #f4e5e2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", "Heebo", Arial, sans-serif; font-size: 15px; line-height: 1.55; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 44px 16px 64px; }
+  h1 { font-size: 28px; margin: 0 0 6px; }
+  .lead { color: var(--muted); margin: 0 0 30px; max-width: 60ch; }
+  .muted { color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 16px; align-items: start; }
+  .opt { background: var(--card); border: 1px solid var(--line); border-top: 2px solid var(--ink); border-radius: 6px; padding: 22px 24px 24px; }
+  .opt h2 { font-size: 19px; margin: 0 0 4px; }
+  .opt .tag { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .opt p { margin: 0 0 14px; }
+  ul.facts { margin: 0 0 18px; padding-inline-start: 18px; color: var(--muted); font-size: 14px; }
+  button, a.btn { font: inherit; display: inline-block; padding: 10px 20px; border-radius: 4px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; text-decoration: none; }
+  button.ghost, a.btn.ghost { background: var(--card); color: var(--ink); border-color: var(--line); }
+  button:disabled { opacity: .5; cursor: default; }
+  button.link { background: none; border: 0; color: var(--accent); padding: 0; text-decoration: underline; font-size: 14px; }
+  .drop { display: block; border: 2px dashed var(--line); border-radius: 6px; padding: 26px 16px; text-align: center; cursor: pointer; background: var(--bg); transition: border-color .15s, background .15s; }
+  .drop:hover, .drop.over, .drop:focus-within { border-color: var(--accent); background: var(--accent-soft); }
+  .drop { position: relative; }
+  .drop input { position: absolute; top: 0; inset-inline-start: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .drop b { display: block; font-size: 16px; }
+  .fname { margin-top: 12px; font-size: 14px; }
+  .msg { margin-top: 12px; padding: 8px 12px; border-radius: 4px; font-size: 14px; }
+  .msg.err { background: var(--crit-soft); color: var(--crit); }
+  .msg.warn { background: #f5edd9; color: var(--warn); }
+  .msg.ok { background: var(--ok-soft); color: var(--ok); }
+  .prev { margin-top: 14px; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: start; padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; }
+  td.n { direction: ltr; text-align: right; font-variant-numeric: tabular-nums; }
+  .cust { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 14px 0 4px; }
+  .cust label { font-size: 12px; color: var(--muted); }
+  .cust input { display: block; width: 100%; margin-top: 3px; padding: 7px 9px; font: inherit; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin-top: 16px; }
+  .note { margin-top: 26px; font-size: 13px; color: var(--muted); border-inline-start: 3px solid var(--warn); padding: 2px 10px; max-width: 70ch; }
+  .resume { margin-bottom: 18px; padding: 10px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; font-size: 14px; }
+</style>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="header.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<script src="brand.js"></script>
+<div class="wrap">
+  <h1>כל ביטוחי הרכב שלך, במקום אחד</h1>
+  <p class="lead">בחרו איך להביא את נתוני הביטוח של הלקוח מהר הביטוח: להעלות קובץ אקסל שיוצא משם, או להתחבר ישירות דרך ממשק ה-API.</p>
+
+  <div id="resume" class="resume" hidden></div>
+
+  <div class="opts">
+    <section class="opt" aria-labelledby="hUp">
+      <h2 id="hUp">העלאת קובץ אקסל</h2>
+      <div class="tag">ייצוא מהר הביטוח · .xlsx / .xls</div>
+      <p>העלו את הקובץ שהורד מהר הביטוח. המערכת תקרא את הפוליסות, תסנן את פוליסות הרכב ותציג אותן ב"הביטוחים שלי".</p>
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+        <b>גררו קובץ לכאן או לחצו לבחירה</b>
+        <span class="muted">עד 5MB</span>
+      </label>
+      <div id="result" aria-live="polite"></div>
+      <div class="actions"><button type="button" class="link" id="sample">הורדת קובץ לדוגמה</button></div>
+    </section>
+
+    <section class="opt" aria-labelledby="hApi">
+      <h2 id="hApi">התחברות דרך API</h2>
+      <div class="tag">חיבור ישיר · הדגמה</div>
+      <p>התחברות לשירות ה-API של הר הביטוח עם תעודת זהות וקוד חד-פעמי, ומשיכת הפוליסות של הלקוח אוטומטית.</p>
+      <ul class="facts">
+        <li>זיהוי בת״ז, שם לקוח וקוד OTP</li>
+        <li>הנתונים נמשכים בזמן ההתחברות, בלי קובץ</li>
+        <li>אפשר גם להיכנס בלי זיהוי עם נתוני דוגמה</li>
+      </ul>
+      <div class="actions"><a class="btn" id="api" href="index.html">התחברות דרך API</a><a class="btn ghost" id="guest" href="index.html#guest">כניסה עם נתוני דוגמה</a></div>
+    </section>
+  </div>
+
+  <p class="note">מצב הדגמה · אין חיבור אמיתי להר הביטוח. מבנה העמודות בקובץ האקסל מזוהה לפי שמות הכותרות, וייתכן שיידרש להתאים אותו לקובץ האמיתי.</p>
+</div>
+
+<script src="libs/xlsx.full.min.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const nis = (n) => "₪" + Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 });
+const fmtDate = (s) => (s ? s.split("-").reverse().join("/") : "");
+const MAX_BYTES = 5 * 1024 * 1024;
+
+/* ---------- זיהוי עמודות לפי שם הכותרת ---------- */
+const norm = (s) => String(s ?? "").replace(/[\"'׳״.,()\-_/\\]/g, "").replace(/\s+/g, " ").trim();
+const ALIAS = {
+  policyId: ["מספר פוליסה", "מס פוליסה", "מספר הפוליסה", "פוליסה"],
+  company: ["חברת ביטוח", "חברה", "שם חברה", "חברת הביטוח", "מבטח"],
+  branch: ["ענף", "סוג ביטוח", "ענף ביטוח", "קטגוריה"],
+  product: ["מוצר", "סוג פוליסה", "תת ענף", "תיאור מוצר", "סוג המוצר", "שם מוצר"],
+  status: ["סטטוס", "מצב", "מצב פוליסה"],
+  start: ["תאריך תחילה", "תחילת ביטוח", "תאריך התחלה", "תחילה"],
+  end: ["תאריך סיום", "סיום ביטוח", "תוקף עד", "תאריך תפוגה", "סיום"],
+  monthly: ["פרמיה חודשית", "פרמיה לחודש"],
+  annual: ["פרמיה שנתית", "פרמיה לשנה", "פרמיה"],
+  payment: ["אמצעי תשלום"],
+  plate: ["מספר רישוי", "מספר רכב", "מס רישוי", "מספר רישוי רכב", "לוחית רישוי"],
+  maker: ["יצרן", "יצרן הרכב", "תוצר"],
+  model: ["דגם", "דגם רכב", "תיאור רכב", "רכב"],
+  year: ["שנת ייצור", "שנת יצור", "שנה"],
+  sum: ["סכום ביטוח", "סכום הביטוח"],
+  deductible: ["השתתפות עצמית"],
+  coverages: ["כיסויים", "רכיבי כיסוי", "כיסוי"],
+  firstName: ["שם פרטי"], lastName: ["שם משפחה"], idNumber: ["תז", "תעודת זהות", "מספר זהות"],
+};
+const ALIAS_LOOKUP = new Map();
+for (const [k, list] of Object.entries(ALIAS)) list.forEach((a) => ALIAS_LOOKUP.set(norm(a), k));
+const REQUIRED = ["policyId", "company"];
+
+/* ---------- המרות ערכים ---------- */
+const parseNum = (v) => { if (typeof v === "number") return v; const n = parseFloat(String(v ?? "").replace(/[₪,\s]/g, "")); return Number.isFinite(n) ? n : null; };
+function parseDate(v) {
+  if (v === "" || v == null) return "";
+  if (typeof v === "number" && v > 20000 && v < 80000) { const d = new Date(Math.round((v - 25569) * 86400000)); return d.toISOString().slice(0, 10); }
+  const s = String(v).trim();
+  let m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s); if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
+  m = /^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})/.exec(s);
+  if (m) { const y = m[3].length === 2 ? "20" + m[3] : m[3]; return `${y}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`; }
+  return "";
+}
+const todayIso = () => new Date().toISOString().slice(0, 10);
+const daysTo = (iso) => Math.round((Date.parse(iso + "T00:00:00Z") - Date.parse(todayIso() + "T00:00:00Z")) / 86400000);
+
+function categoryOf(text) {
+  if (/רכב|חובה|מקיף|צד ג|צד שלישי/.test(text)) return "MOTOR";
+  if (/בריאות|מחלות|ניתוח/.test(text)) return "HEALTH";
+  return "OTHER";
+}
+
+/* ---------- קריאת קובץ האקסל והמרה למבנה הנתונים של המערכת ---------- */
+function parseWorkbook(buf, filename, custOverride = {}) {
+  const wb = XLSX.read(buf, { type: "array" });
+  const names = wb.SheetNames;
+  const sheetName = names.find((n) => /פוליס/.test(n)) || names[0];
+  const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, raw: true, defval: "" });
+  // שורת הכותרות: הראשונה (מתוך 15) שבה מזוהות לפחות 3 עמודות מוכרות
+  let hi = -1, cols = {};
+  for (let r = 0; r < Math.min(rows.length, 15) && hi < 0; r++) {
+    const map = {};
+    rows[r].forEach((c, i) => { const k = ALIAS_LOOKUP.get(norm(c)); if (k && !(k in map)) map[k] = i; });
+    if (Object.keys(map).length >= 3) { hi = r; cols = map; }
+  }
+  if (hi < 0) throw new Error("לא נמצאה שורת כותרות מוכרת (למשל: מספר פוליסה, חברת ביטוח, תאריך סיום).");
+  const missing = REQUIRED.filter((k) => !(k in cols));
+  if (missing.length) throw new Error("חסרות עמודות חובה: " + missing.map((k) => ALIAS[k][0]).join(", "));
+
+  const get = (row, k) => (k in cols ? row[cols[k]] : "");
+  const policies = [], report = { sheet: sheetName, rowsRead: 0, skipped: 0, other: 0, warnings: [] };
+  const cust = { firstName: "", lastName: "", idNumber: "" };
+  const today = todayIso();
+
+  for (const row of rows.slice(hi + 1)) {
+    if (!row.some((c) => String(c).trim() !== "")) continue;
+    report.rowsRead++;
+    for (const k of Object.keys(cust)) if (!cust[k] && String(get(row, k)).trim()) cust[k] = String(get(row, k)).trim();
+    const policyId = String(get(row, "policyId")).trim(), company = String(get(row, "company")).trim();
+    if (!policyId || !company) { report.skipped++; continue; }
+    const branch = String(get(row, "branch")).trim(), product = String(get(row, "product")).trim();
+    const category = categoryOf(branch + " " + product);
+    if (category !== "MOTOR") { report.other++; continue; }
+    const start = parseDate(get(row, "start")), end = parseDate(get(row, "end"));
+    let monthly = parseNum(get(row, "monthly")), annual = parseNum(get(row, "annual"));
+    if (monthly == null && annual != null) monthly = Math.round((annual / 12) * 100) / 100;
+    if (annual == null && monthly != null) annual = monthly * 12;
+    const st = String(get(row, "status"));
+    const status = /לא פעיל|פג|בוטל|הסתיים/.test(st) ? "EXPIRED" : /פעיל/.test(st) ? "ACTIVE" : end && end < today ? "EXPIRED" : "ACTIVE";
+    const modelTxt = String(get(row, "model")).trim(), maker = String(get(row, "maker")).trim();
+    const coverages = String(get(row, "coverages")).split(/[;\n|]/).map((s) => s.trim()).filter(Boolean).map((name) => ({ name, isCovered: true, sumInsuredNis: null }));
+    const sum = parseNum(get(row, "sum")), ded = parseNum(get(row, "deductible"));
+    if (sum != null || ded != null) {
+      const main = { name: product || branch || "כיסוי עיקרי", isCovered: true, sumInsuredNis: sum };
+      if (ded != null) main.deductibleNis = ded;
+      coverages.unshift(main);
+    }
+    const yr = parseNum(get(row, "year"));
+    policies.push({
+      policyId, insuranceCompany: company, category, subCategory: product || branch || "ביטוח רכב", status,
+      startDate: start || end || today, endDate: end || start || today,
+      premium: { monthlyNis: monthly ?? 0, annualNis: annual ?? 0, ...(String(get(row, "payment")).trim() ? { paymentMethod: /הוראת קבע/.test(get(row, "payment")) ? "DIRECT_DEBIT" : "CREDIT_CARD" } : {}) },
+      assetDetails: { licensePlate: String(get(row, "plate")).trim() || "לא צוין", vehicleManufacturer: maker, vehicleModel: modelTxt, modelYear: yr || "" },
+      coverages,
+    });
+  }
+  if (!policies.length) throw new Error(report.rowsRead ? "לא נמצאו פוליסות רכב בקובץ (נקראו " + report.rowsRead + " שורות)." : "הקובץ ריק.");
+  if (!("end" in cols)) report.warnings.push("חסרה עמודת תאריך סיום: תוקף הפוליסות לא יוצג במדויק.");
+  if (!("plate" in cols)) report.warnings.push("חסרה עמודת מספר רישוי: הפוליסות יקובצו תחת רכב אחד.");
+  if (report.other) report.warnings.push(report.other === 1 ? "שורה אחת שאינה פוליסת רכב הושמטה." : report.other + " שורות שאינן פוליסות רכב הושמטו.");
+  if (report.skipped) report.warnings.push(report.skipped === 1 ? "שורה אחת ללא מספר פוליסה או חברה דולגה." : report.skipped + " שורות ללא מספר פוליסה או חברה דולגו.");
+
+  const data = {
+    status: "SUCCESS", requestId: "upload-" + Date.now().toString(36), extractedAt: new Date().toISOString(),
+    source: "קובץ אקסל מהר הביטוח", uploadName: filename,
+    customer: {
+      idNumber: custOverride.idNumber ?? cust.idNumber, firstName: custOverride.firstName ?? cust.firstName, lastName: custOverride.lastName ?? cust.lastName,
+      birthDate: "", phone: "", email: "", drivingLicenceYear: "",
+    },
+    summary: { detectedAlerts: makeAlerts(policies) },
+    policies,
+  };
+  return { data, report };
+}
+
+// התראות בסיסיות שנגזרות מהפוליסות (כמו בנתוני ה-API)
+function makeAlerts(policies) {
+  const out = [], active = policies.filter((p) => p.status === "ACTIVE");
+  for (const p of active) {
+    const d = daysTo(p.endDate), a = p.assetDetails;
+    if (d >= 0 && d <= 30) out.push({ code: "MOTOR_EXPIRING", severity: d <= 14 ? "CRITICAL" : "HIGH", category: "MOTOR", relatedAssetId: a.licensePlate,
+      message: `${p.subCategory} ל${(a.vehicleManufacturer + " " + a.vehicleModel).trim() || "רכב"} מסתיים בעוד ${d} ימים (${fmtDate(p.endDate)}).` });
+  }
+  const byPlate = {};
+  active.forEach((p) => (byPlate[p.assetDetails.licensePlate] ||= []).push(p));
+  for (const [plate, list] of Object.entries(byPlate)) {
+    if (!list.some((p) => /מקיף/.test(p.subCategory))) {
+      const a = list[0].assetDetails;
+      out.push({ code: "MISSING_COMPREHENSIVE_COVERAGE", severity: "HIGH", category: "MOTOR", relatedAssetId: plate,
+        message: `לרכב ${(a.vehicleManufacturer + " " + a.vehicleModel).trim() || plate} קיים ביטוח חובה / צד ג' בלבד - ללא כיסוי מקיף.` });
+    }
+  }
+  return out;
+}
+
+/* ---------- ממשק ההעלאה ---------- */
+let parsed = null;
+function showResult() {
+  const { data, report } = parsed, c = data.customer, ps = data.policies;
+  $("#result").innerHTML = `
+    <div class="fname"><b>${esc(data.uploadName)}</b> · גיליון "${esc(report.sheet)}"</div>
+    <div class="msg ok">נמצאו ${ps.length} פוליסות רכב מתוך ${report.rowsRead} שורות.</div>
+    ${report.warnings.map((w) => `<div class="msg warn">${esc(w)}</div>`).join("")}
+    <div class="prev"><table><thead><tr><th>פוליסה</th><th>חברה</th><th>תוקף עד</th><th>פרמיה שנתית</th></tr></thead><tbody>
+      ${ps.slice(0, 5).map((p) => `<tr><td class="n">${esc(p.policyId)}</td><td>${esc(p.insuranceCompany)}</td><td class="n">${fmtDate(p.endDate)}</td><td class="n">${nis(p.premium.annualNis)}</td></tr>`).join("")}
+    </tbody></table>${ps.length > 5 ? `<div class="muted" style="font-size:12px;margin-top:4px">ועוד ${ps.length - 5} פוליסות</div>` : ""}</div>
+    <div class="cust">
+      <div><label for="cf">שם פרטי</label><input id="cf" value="${esc(c.firstName)}" autocomplete="off"></div>
+      <div><label for="cl">שם משפחה</label><input id="cl" value="${esc(c.lastName)}" autocomplete="off"></div>
+      <div><label for="ci">ת״ז</label><input id="ci" value="${esc(c.idNumber)}" inputmode="numeric" maxlength="9" dir="ltr" autocomplete="off"></div>
+    </div>
+    <div class="muted" style="font-size:12px">פרטי הלקוח אופציונליים ומשמשים להצגה ולטפסי ההצעה.</div>
+    <div class="actions"><button type="button" id="go">המשך להביטוחים שלי</button></div>`;
+  $("#go").onclick = () => {
+    data.customer.firstName = $("#cf").value.trim(); data.customer.lastName = $("#cl").value.trim(); data.customer.idNumber = $("#ci").value.trim();
+    try {
+      sessionStorage.setItem("harUpload", JSON.stringify(data));
+      sessionStorage.setItem("harSource", "excel");
+      sessionStorage.removeItem("harSession");
+    } catch (e) { return showError("לא ניתן לשמור את הנתונים בדפדפן (הקובץ גדול מדי)."); }
+    location.href = "index.html";
+  };
+}
+const showError = (m) => { $("#result").innerHTML = `<div class="msg err" role="alert">${esc(m)}</div>`; };
+
+async function handleFile(f) {
+  parsed = null;
+  if (!f) return;
+  if (!/\.(xlsx|xls)$/i.test(f.name)) return showError("יש להעלות קובץ אקסל (.xlsx או .xls).");
+  if (f.size > MAX_BYTES) return showError("הקובץ גדול מדי (עד 5MB).");
+  $("#result").innerHTML = `<div class="fname muted">קורא את ${esc(f.name)}…</div>`;
+  try { parsed = parseWorkbook(await f.arrayBuffer(), f.name); showResult(); }
+  catch (e) { showError(e.message || "לא ניתן לקרוא את הקובץ."); }
+}
+$("#file").onchange = (e) => handleFile(e.target.files[0]);
+const drop = $("#drop");
+["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", (e) => handleFile(e.dataTransfer.files[0]));
+
+/* ---------- קובץ לדוגמה: נבנה מ-data.json בעמודות שהמערכת מזהה ---------- */
+function sampleRows(d) {
+  return d.policies.map((p) => {
+    const a = p.assetDetails || {}, cv = (p.coverages || []), main = cv.find((c) => c.sumInsuredNis != null || c.deductibleNis != null);
+    return {
+      "מספר פוליסה": p.policyId, "חברת ביטוח": p.insuranceCompany, "ענף": p.category === "MOTOR" ? "רכב" : "בריאות", "סוג ביטוח": p.subCategory, "סטטוס": p.status === "ACTIVE" ? "פעילה" : "פגה",
+      "תאריך תחילה": fmtDate(p.startDate), "תאריך סיום": fmtDate(p.endDate), "פרמיה חודשית": p.premium.monthlyNis, "פרמיה שנתית": p.premium.annualNis ?? p.premium.monthlyNis * 12,
+      "מספר רישוי": a.licensePlate || "", "יצרן": a.vehicleManufacturer || "", "דגם": a.vehicleModel || "", "שנת ייצור": a.modelYear || "",
+      "סכום ביטוח": main?.sumInsuredNis ?? "", "השתתפות עצמית": main?.deductibleNis ?? "", "כיסויים": cv.map((c) => c.name).join("; "),
+    };
+  });
+}
+$("#sample").onclick = async () => {
+  const d = await (await fetch("data.json")).json();
+  const ws = XLSX.utils.json_to_sheet(sampleRows(d));
+  ws["!cols"] = Object.keys(sampleRows(d)[0]).map(() => ({ wch: 16 }));
+  const wb = XLSX.utils.book_new();
+  wb.Workbook = { Views: [{ RTL: true }] };
+  XLSX.utils.book_append_sheet(wb, ws, "פוליסות");
+  XLSX.writeFile(wb, "har-habituach-sample.xlsx");
+};
+
+/* ---------- המשך עם קובץ שהועלה קודם באותה סשן ---------- */
+(function () {
+  let up = null; try { up = JSON.parse(sessionStorage.getItem("harUpload")); } catch (e) {}
+  if (up && sessionStorage.getItem("harSource") === "excel") {
+    const box = $("#resume"); box.hidden = false;
+    box.innerHTML = `הועלה קובץ בסשן הזה: <b>${esc(up.uploadName)}</b> (${up.policies.length} פוליסות רכב). <a href="index.html" style="color:var(--accent)">המשך להביטוחים שלי</a>`;
+  }
+})();
+// בחירה ב-API או באורח מבטלת את מקור האקסל
+["api", "guest"].forEach((id) => $("#" + id).addEventListener("click", () => {
+  try { sessionStorage.setItem("harSource", "api"); sessionStorage.removeItem("harUpload"); } catch (e) {}
+}));
+</script>
+<script src="privacy.js"></script>
+</body>
+</html>

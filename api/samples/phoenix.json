@@ -1,0 +1,141 @@
+{
+  "company": "הפניקס",
+  "note": "דוגמה שנוצרה מקוד ההדגמה: בקשה ותגובה להצעה, ותגובת סירוב.",
+  "quote": {
+    "request": {
+      "method": "POST",
+      "url": "https://api.fnx-quotes.example/v3/motor/quote",
+      "headers": {
+        "Accept": "application/json",
+        "X-Api-Key": "demo-fnx-4f1c9a",
+        "X-Partner": "rivo-demo",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-95f1f92a"
+      },
+      "body": {
+        "request_id": "RQ-95f1f92a",
+        "start_date": "2026-10-01",
+        "insured_national_id": "012345678",
+        "customer_first_name": "אלכס",
+        "customer_last_name": "כהן",
+        "customer_phone": "0548765432",
+        "customer_age": 43,
+        "vehicle_plate": "33445566",
+        "vehicle_manufacturer": "מאזדה",
+        "vehicle_model": "CX-5 EXECUTIVE 2.0",
+        "vehicle_year": 2021,
+        "vehicle_engine": "GASOLINE",
+        "driver_licence_years": 26,
+        "driver_youngest_age": 30,
+        "driver_count": 2,
+        "driver_who_drives": "named",
+        "driver_claims_count": 0,
+        "driver_at_fault": "N",
+        "driver_prior_cancellation": "N",
+        "driver_convictions": "N",
+        "usage_type": "private",
+        "usage_mileage": "10-20",
+        "usage_parking": "private",
+        "usage_security": "N",
+        "coverage_kind": "comprehensive",
+        "coverage_deductible_pref": "std",
+        "prior_insurer": "הפניקס",
+        "prior_policy_number": "MOT-2025-8812",
+        "prior_premium_agorot": 432000,
+        "prior_kind": "comprehensive",
+        "prior_deductible_agorot": 145000,
+        "prior_sum_insured_agorot": 11800000,
+        "channel": "partner_api"
+      }
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "456"
+      },
+      "body": {
+        "quote_id": "PHOENIX-2A7986E4",
+        "kind": "comprehensive",
+        "premium_annual_agorot": 412000,
+        "premium_monthly_agorot": 34300,
+        "installments": 10,
+        "deductible_agorot": 165000,
+        "sum_insured_agorot": 11800000,
+        "third_party_limit_agorot": 200000000,
+        "road_assist": "Y",
+        "replacement_days": 14,
+        "glass_included": "N",
+        "glass_deductible_agorot": null,
+        "battery_limit_agorot": null,
+        "charger_limit_agorot": null,
+        "young_driver": "none",
+        "valid_until": "2026-10-04",
+        "status": "OK",
+        "currency": "ILS"
+      }
+    }
+  },
+  "declined": {
+    "request": {
+      "method": "POST",
+      "url": "https://api.fnx-quotes.example/v3/motor/quote",
+      "headers": {
+        "Accept": "application/json",
+        "X-Api-Key": "demo-fnx-4f1c9a",
+        "X-Partner": "rivo-demo",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-964bceea"
+      },
+      "body": {
+        "request_id": "RQ-964bceea",
+        "start_date": "2026-10-01",
+        "insured_national_id": "012345678",
+        "customer_first_name": "אלכס",
+        "customer_last_name": "כהן",
+        "customer_phone": "0548765432",
+        "customer_age": 43,
+        "vehicle_plate": "33445566",
+        "vehicle_manufacturer": "מאזדה",
+        "vehicle_model": "CX-5 EXECUTIVE 2.0",
+        "vehicle_year": 2021,
+        "vehicle_engine": "GASOLINE",
+        "driver_licence_years": 1,
+        "driver_youngest_age": 17,
+        "driver_count": 2,
+        "driver_who_drives": "named",
+        "driver_claims_count": 3,
+        "driver_at_fault": "Y",
+        "driver_prior_cancellation": "Y",
+        "driver_convictions": "Y",
+        "usage_type": "business",
+        "usage_mileage": "gt30",
+        "usage_parking": "private",
+        "usage_security": "N",
+        "coverage_kind": "third",
+        "coverage_deductible_pref": "std",
+        "prior_insurer": "הפניקס",
+        "prior_policy_number": "MOT-2025-8812",
+        "prior_premium_agorot": 432000,
+        "prior_kind": "comprehensive",
+        "prior_deductible_agorot": 145000,
+        "prior_sum_insured_agorot": 11800000,
+        "channel": "partner_api"
+      }
+    },
+    "response": {
+      "status": 422,
+      "statusText": "Unprocessable Entity",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "120"
+      },
+      "body": {
+        "status": "REJECTED",
+        "reject_code": "TRAFFIC_CONVICTIONS",
+        "reject_reason": "serious traffic offences in the last 3 years"
+      }
+    }
+  }
+}

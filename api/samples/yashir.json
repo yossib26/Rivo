@@ -1,0 +1,172 @@
+{
+  "company": "ביטוח ישיר",
+  "note": "דוגמה שנוצרה מקוד ההדגמה: בקשה ותגובה להצעה, ותגובת סירוב.",
+  "quote": {
+    "request": {
+      "method": "POST",
+      "url": "https://api.555-direct.example/quote/car",
+      "headers": {
+        "Accept": "application/json",
+        "X-Auth-Token": "demo-yashir-e6a2d4",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-95f1f92a"
+      },
+      "body": {
+        "request_id": "RQ-95f1f92a",
+        "start_date": "2026-10-01",
+        "person": {
+          "id_number": "012345678",
+          "first_name": "אלכס",
+          "last_name": "כהן",
+          "mobile": "0548765432",
+          "age": 43
+        },
+        "vehicle": {
+          "plate": "33445566",
+          "manufacturer": "מאזדה",
+          "model": "CX-5 EXECUTIVE 2.0",
+          "year": 2021,
+          "engine": "GASOLINE"
+        },
+        "driver": {
+          "licence_years": 26,
+          "youngest_age": 30,
+          "count": 2,
+          "who_drives": "named",
+          "claims_count": 0,
+          "at_fault": false,
+          "prior_cancellation": false,
+          "convictions": false
+        },
+        "usage": {
+          "type": "personal",
+          "mileage": "10-20",
+          "parking": "private",
+          "security": false
+        },
+        "coverage": {
+          "kind": "comprehensive",
+          "deductible_pref": "std"
+        },
+        "prior": {
+          "insurer": "הפניקס",
+          "policy_number": "MOT-2025-8812",
+          "annual_premium_nis": 4320,
+          "kind": "comprehensive",
+          "deductible_nis": 1450,
+          "sum_insured_nis": 118000
+        }
+      }
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "390"
+      },
+      "body": {
+        "result": {
+          "quote_id": "YASHIR-6B503F9C",
+          "kind": "comprehensive",
+          "price": {
+            "yearly": 3810,
+            "monthly": 318,
+            "max_payments": 10
+          },
+          "covers": {
+            "own_damage": {
+              "deductible": 1750,
+              "sum": 118000
+            },
+            "third_party": {
+              "limit": 2000000
+            },
+            "road_service": true,
+            "replacement_car_days": 30,
+            "glass": {
+              "on": true,
+              "deductible": 0
+            },
+            "ev_battery": null,
+            "ev_charger": null
+          },
+          "young_driver": "none",
+          "valid_until": "2026-10-04"
+        },
+        "success": true
+      }
+    }
+  },
+  "declined": {
+    "request": {
+      "method": "POST",
+      "url": "https://api.555-direct.example/quote/car",
+      "headers": {
+        "Accept": "application/json",
+        "X-Auth-Token": "demo-yashir-e6a2d4",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-964bceea"
+      },
+      "body": {
+        "request_id": "RQ-964bceea",
+        "start_date": "2026-10-01",
+        "person": {
+          "id_number": "012345678",
+          "first_name": "אלכס",
+          "last_name": "כהן",
+          "mobile": "0548765432",
+          "age": 43
+        },
+        "vehicle": {
+          "plate": "33445566",
+          "manufacturer": "מאזדה",
+          "model": "CX-5 EXECUTIVE 2.0",
+          "year": 2021,
+          "engine": "GASOLINE"
+        },
+        "driver": {
+          "licence_years": 1,
+          "youngest_age": 17,
+          "count": 2,
+          "who_drives": "named",
+          "claims_count": 3,
+          "at_fault": true,
+          "prior_cancellation": true,
+          "convictions": true
+        },
+        "usage": {
+          "type": "commercial",
+          "mileage": "gt30",
+          "parking": "private",
+          "security": false
+        },
+        "coverage": {
+          "kind": "third",
+          "deductible_pref": "std"
+        },
+        "prior": {
+          "insurer": "הפניקס",
+          "policy_number": "MOT-2025-8812",
+          "annual_premium_nis": 4320,
+          "kind": "comprehensive",
+          "deductible_nis": 1450,
+          "sum_insured_nis": 118000
+        }
+      }
+    },
+    "response": {
+      "status": 422,
+      "statusText": "Unprocessable Entity",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "105"
+      },
+      "body": {
+        "success": false,
+        "error_code": "BUSINESS_USE",
+        "error_message": "commercial use is not underwritten online"
+      }
+    }
+  }
+}

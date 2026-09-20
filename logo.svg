@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Rivo">
+  <rect width="32" height="32" rx="7" fill="#1f4e8c"/>
+  <path d="M11 23V9h6.5a4.5 4.5 0 0 1 0 9H11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M17 18l4 5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="23.5" cy="23.5" r="2.2" fill="#9fc0e6"/>
+</svg>

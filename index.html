@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="auth.js" data-require></script>
+<title>הביטוחים שלי</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f5f4f0; --card: #ffffff; --ink: #1f2328; --muted: #666a70; --line: #dddad2;
+    --accent: #0f5a63; --accent-soft: #e8f0f0;
+    --ok: #1f6a44; --ok-soft: #e7f0ea;
+    --warn: #8a5300; --warn-soft: #f5edd9;
+    --crit: #a3312a; --crit-soft: #f4e5e2;
+    --info: #0f5a63; --info-soft: #e8f0f0;
+    --s1: #0f5a63; --s2: #b8651b; --s3: #56668a; --s4: #8b7d2f; --s5: #94486a;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", "Heebo", Arial, sans-serif; font-size: 15px; line-height: 1.5;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 56px; }
+  h1 { font-size: 26px; margin: 0; }
+  h2 { font-size: 18px; margin: 32px 0 12px; }
+  .muted { color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+
+  header.top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+  .cust { display: flex; flex-wrap: wrap; gap: 4px 18px; color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 20px; }
+  .kpi { padding: 16px 18px; }
+  .kpi .v { font-size: 28px; font-weight: 700; margin-top: 2px; }
+  .kpi .l { color: var(--muted); font-size: 13px; }
+  .kpi .s { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+  .alerts { display: grid; gap: 8px; }
+  .alert { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--line); border-inline-start: 5px solid; background: var(--card); }
+  .alert.CRITICAL { border-inline-start-color: var(--crit); background: var(--crit-soft); }
+  .alert.HIGH { border-inline-start-color: var(--warn); background: var(--warn-soft); }
+  .alert.INFO { border-inline-start-color: var(--info); background: var(--info-soft); }
+  .alert b { white-space: nowrap; }
+  .alert .msg { flex: 1; }
+
+  .badge { display: inline-block; padding: 1px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .badge.CRITICAL { background: var(--crit); color: #fff; }
+  .badge.HIGH { background: var(--warn); color: #fff; }
+  .badge.INFO { background: var(--info); color: #fff; }
+  .badge.ok { background: var(--ok-soft); color: var(--ok); }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .badge.crit { background: var(--crit-soft); color: var(--crit); }
+  .badge.gray { background: var(--line); color: var(--muted); }
+
+  .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+  .chart { padding: 16px 18px; }
+  .chart h3 { margin: 0 0 12px; font-size: 15px; }
+  .bar-row { display: grid; grid-template-columns: 150px 1fr auto; gap: 10px; align-items: center; margin: 8px 0; font-size: 13px; }
+  .bar-row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .track { height: 16px; background: var(--line); border-radius: 8px; overflow: hidden; display: flex; direction: rtl; }
+  .seg { height: 100%; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-inline-end: 5px; vertical-align: -1px; }
+
+  .vehicle { margin-bottom: 16px; overflow: hidden; }
+  .vhead { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+  .vhead .title { font-size: 18px; font-weight: 700; }
+  .plate { direction: ltr; display: inline-flex; align-items: center; gap: 6px; background: #ffd936; color: #111; border: 2px solid #111; border-radius: 6px; padding: 1px 10px; font-weight: 700; letter-spacing: 1.5px; font-size: 15px; }
+  .plate::before { content: ""; width: 7px; height: 16px; background: #1d4fd8; border-radius: 2px; }
+  .vtotal { margin-inline-start: auto; text-align: end; }
+  .vtotal .v { font-size: 20px; font-weight: 700; }
+  .vmeta { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 18px 0; }
+  .valerts { padding: 10px 18px 0; display: grid; gap: 6px; }
+  .valerts .alert { padding: 8px 12px; font-size: 13.5px; }
+
+  .policies { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; padding: 14px 18px 18px; }
+  .policy { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .policy.expired { opacity: .7; }
+  .phead { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+  .phead .t { font-weight: 700; }
+  .pmeta { color: var(--muted); font-size: 13px; }
+  .price { margin: 10px 0 2px; display: flex; align-items: baseline; gap: 6px; }
+  .price .v { font-size: 22px; font-weight: 700; }
+  .term { margin-top: 10px; font-size: 12.5px; color: var(--muted); }
+  .term .dates { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .prog { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; direction: rtl; }
+  .prog > div { height: 100%; background: var(--accent); }
+  .prog.warn > div { background: var(--warn); }
+  .prog.crit > div { background: var(--crit); }
+  .cov { list-style: none; margin: 12px 0 0; padding: 0; border-top: 1px solid var(--line); }
+  .cov li { padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 13.5px; }
+  .cov li:last-child { border-bottom: 0; }
+  .cov .row { display: flex; gap: 8px; align-items: flex-start; }
+  .cov .row .n { flex: 1; }
+  .cov .row .ck { color: var(--ok); font-weight: 700; }
+  .cov .row .ck.no { color: var(--crit); }
+  .cov .nums { color: var(--muted); font-size: 12.5px; margin-inline-start: 22px; }
+  .policy { display: flex; flex-direction: column; }
+  .cmp-btn { margin-top: auto; display: block; text-align: center; text-decoration: none; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--accent); color: var(--accent); background: var(--accent-soft); font-weight: 600; font-size: 14px; }
+  .cov { margin-bottom: 14px; }
+  .cmp-btn:hover { background: var(--accent); color: #fff; }
+  .drivers { margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+
+  .missing { padding: 10px 18px 16px; color: var(--muted); font-size: 13px; }
+  footer { margin-top: 32px; color: var(--muted); font-size: 12.5px; text-align: center; }
+  .err { padding: 24px; text-align: center; }
+  .who { margin-inline-start: auto; align-self: center; display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; white-space: nowrap; padding-inline-start: 16px; }
+  button.link { font: inherit; font-size: 13px; background: none; border: 0; color: var(--accent); cursor: pointer; padding: 4px 2px; text-decoration: underline; }
+  button.link:disabled { color: var(--muted); cursor: default; text-decoration: none; }
+  button.pick:disabled { opacity: .6; cursor: default; }
+  .login { max-width: 420px; margin: 40px auto; padding: 28px 26px; }
+  .login h1 { font-size: 22px; }
+  .demo-note { margin: 12px 0; padding: 6px 12px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); font-size: 12.5px; font-weight: 600; }
+  .login label { display: block; font-size: 13px; color: var(--muted); margin-top: 14px; }
+  .login input { display: block; width: 100%; margin-top: 4px; padding: 10px 12px; font: inherit; font-size: 16px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+  .login input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .login input.ltr { direction: ltr; text-align: start; }
+  .login input.otp { letter-spacing: 8px; font-size: 22px; text-align: center; }
+  .login button.pick { width: 100%; margin-top: 16px; padding: 11px; }
+  .form-err { min-height: 20px; margin-top: 8px; color: var(--crit); font-size: 13px; }
+  .links { display: flex; justify-content: space-between; margin-top: 12px; }
+  .sms { margin: 8px 0 12px; padding: 12px 14px; border-radius: 12px; background: var(--ok-soft); color: var(--ink); border: 1px dashed var(--ok); font-size: 14px; }
+  .sms-code { font-size: 22px; font-weight: 700; letter-spacing: 4px; color: var(--ok); }
+  .steps { list-style: none; margin: 16px 0 0; padding: 0; }
+  .steps li { display: flex; align-items: center; gap: 12px; padding: 9px 0; color: var(--muted); }
+  .steps .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
+  .steps li.active { color: var(--ink); }
+  .steps li.active .dot { border-color: var(--accent); border-top-color: transparent; animation: spin .8s linear infinite; }
+  .steps li.done { color: var(--ink); }
+  .steps li.done .dot { background: var(--ok); border-color: var(--ok); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .tabs-bar { position: sticky; top: 64px; z-index: 10; background: var(--card); border-bottom: 1px solid var(--line); }
+  .tabs { max-width: 1120px; margin: 0 auto; padding: 0 16px; display: flex; gap: 4px; overflow-x: auto; }
+  .tabs button { font: inherit; font-weight: 600; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--muted); padding: 12px 18px; cursor: pointer; white-space: nowrap; }
+  .tabs button:hover { color: var(--ink); }
+  .tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+  button.pick { font: inherit; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; margin-top: 10px; }
+  @media (max-width: 520px) { .bar-row { grid-template-columns: 100px 1fr auto; } h1 { font-size: 22px; } }
+
+
+  /* ---- בסיס ---- */
+  body { background: var(--bg); }
+  h1 { font-size: 24px; font-weight: 700; letter-spacing: 0; }
+  h2 { font-size: 16px; font-weight: 700; margin: 34px 0 12px; padding-top: 10px; border-top: 2px solid var(--ink); }
+  .card h2, .wiz h2, .err h2, .tdlg h2, .login h2 { border-top: 0; padding-top: 0; }
+  .row-h { border-top: 2px solid var(--ink); margin-top: 34px; padding-top: 10px; align-items: baseline; }
+  .row-h h2 { border: 0; margin: 0; padding: 0; }
+  .card { border-radius: 6px; box-shadow: none; }
+  button.act, button.pick { border-radius: 4px; box-shadow: none; background: var(--accent); border-color: var(--accent); }
+  button.ghost { border-radius: 4px; }
+  .badge, .chip { border-radius: 3px; font-weight: 500; }
+  .badge.CRITICAL, .badge.HIGH, .badge.INFO { background: none; padding: 0; font-weight: 700; min-width: 3.4em; }
+  .badge.CRITICAL { color: var(--crit); } .badge.HIGH { color: var(--warn); } .badge.INFO { color: var(--accent); }
+  .badge.ok, .badge.warn, .badge.crit { background: none; border: 1px solid currentColor; }
+  .badge.gray { background: none; border: 1px solid var(--line); color: var(--muted); }
+  .demo-note { background: none; border: 0; border-inline-start: 3px solid var(--warn); border-radius: 0; padding: 2px 10px; color: var(--ink); font-weight: 400; }
+  .login { border-radius: 6px; }
+  .login input, .fld input:not([type=radio]):not([type=checkbox]), .fld select { border-radius: 4px; }
+  .sms { border-radius: 4px; }
+  .tabs-bar { background: var(--card); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .kpis { gap: 0; margin-top: 22px; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); }
+  .kpi { background: none; border: 0; border-radius: 0; box-shadow: none; padding: 14px 18px; border-inline-start: 1px solid var(--line); }
+  .kpi:first-child { border-inline-start: 0; padding-inline-start: 0; }
+  .kpi .v { font-size: 26px; font-weight: 600; }
+  .alerts { gap: 0; }
+  .alert, .alert.CRITICAL, .alert.HIGH, .alert.INFO { background: none; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 10px 0; }
+  .valerts { gap: 0; }
+  .valerts .alert { padding: 8px 0; }
+  .vehicle { border-radius: 6px; }
+  .vhead { background: none; }
+  .policy { border-radius: 4px; transition: none; }
+  .policy:hover { box-shadow: none; transform: none; }
+  .track { height: 8px; border-radius: 2px; }
+  .prog { height: 4px; border-radius: 0; }
+  .cmp-btn { border-radius: 4px; background: none; }
+  .cmp-btn:hover { background: var(--accent-soft); color: var(--accent); }
+  a.link { font-size: 13px; color: var(--accent); }
+  .who a.link { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="header.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<script src="brand.js"></script>
+<nav class="tabs-bar" id="tabsBar" hidden><div class="tabs" id="tabs" role="tablist"></div></nav>
+<div class="wrap" id="app"></div>
+<input type="file" id="picker" accept=".json,application/json" hidden>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const nis = (n) => "₪" + Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 });
+const fmtDate = (s) => { const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; };
+const dayMs = 86400000;
+const utc = (s) => Date.parse(s + "T00:00:00Z");
+const todayUtc = () => { const n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); };
+
+const L = {
+  payment: { CREDIT_CARD: "כרטיס אשראי", DIRECT_DEBIT: "הוראת קבע" },
+  engine: { GASOLINE: "בנזין", ELECTRIC: "חשמלי", DIESEL: "דיזל", HYBRID: "היברידי" },
+  owner: { PRIVATE: "בעלות פרטית", PRIVATE_YOUNG_DRIVER: "פרטי – נהג צעיר" },
+  sev: { CRITICAL: "קריטי", HIGH: "חשוב", INFO: "מידע" },
+  status: { ACTIVE: "פעילה", EXPIRED: "פגה" },
+};
+const COLORS = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)", "var(--s5)"];
+
+function render(data) {
+  const motor = data.policies.filter((p) => p.category === "MOTOR");
+  const active = motor.filter((p) => p.status === "ACTIVE");
+  const expired = motor.filter((p) => p.status !== "ACTIVE");
+  const alerts = (data.summary?.detectedAlerts || []).filter((a) => a.category === "MOTOR");
+  const today = todayUtc();
+
+  // group by vehicle (license plate)
+  const vehicles = new Map();
+  for (const p of motor) {
+    const a = p.assetDetails; if (!a) continue;
+    if (!vehicles.has(a.licensePlate)) vehicles.set(a.licensePlate, { plate: a.licensePlate, info: {}, policies: [] });
+    const v = vehicles.get(a.licensePlate);
+    v.info = { ...v.info, ...a };
+    v.policies.push(p);
+  }
+  const vlist = [...vehicles.values()].map((v) => ({
+    ...v,
+    activePolicies: v.policies.filter((p) => p.status === "ACTIVE"),
+    monthly: v.policies.filter((p) => p.status === "ACTIVE").reduce((s, p) => s + p.premium.monthlyNis, 0),
+  })).sort((a, b) => (b.activePolicies.length > 0) - (a.activePolicies.length > 0) || b.monthly - a.monthly);
+
+  const monthly = active.reduce((s, p) => s + p.premium.monthlyNis, 0);
+  const annual = active.reduce((s, p) => s + (p.premium.annualNis ?? p.premium.monthlyNis * 12), 0);
+  const activeVehicles = vlist.filter((v) => v.activePolicies.length).length;
+  const nextEnd = active.map((p) => p.endDate).sort()[0];
+  const nextDays = nextEnd ? Math.round((utc(nextEnd) - today) / dayMs) : null;
+
+  const c = data.customer;
+  let h = `
+  <header class="top">
+    <div>
+      <h1>הביטוחים שלי</h1>
+      <div class="cust">
+        <span>${esc(((c.firstName || "") + " " + (c.lastName || "")).trim() || "לקוח ללא פרטים")}</span>
+        ${c.idNumber ? `<span>ת״ז <span class="num">${esc(c.idNumber)}</span></span>` : ""}
+        ${c.drivingLicenceYear ? `<span>רישיון משנת <span class="num">${esc(c.drivingLicenceYear)}</span></span>` : ""}
+        ${c.phone ? `<span><span class="num">${esc(c.phone)}</span></span>` : ""}
+      </div>
+    </div>
+    <div class="muted" style="font-size:13px">נתונים מתאריך <span class="num">${esc(fmtDate(data.extractedAt.slice(0, 10)))}</span></div>
+  </header>
+
+  <section class="kpis">
+    <div class="card kpi"><div class="l">פוליסות רכב פעילות</div><div class="v num">${active.length}</div><div class="s">${expired.length ? expired.length + " שפגה" : "ללא פוליסות שפגו"}</div></div>
+    <div class="card kpi"><div class="l">רכבים מבוטחים</div><div class="v num">${activeVehicles}</div></div>
+    <div class="card kpi"><div class="l">פרמיה חודשית</div><div class="v num">${nis(monthly)}</div></div>
+    <div class="card kpi"><div class="l">פרמיה שנתית</div><div class="v num">${nis(annual)}</div></div>
+    ${nextEnd ? `<div class="card kpi"><div class="l">פוליסה קרובה לפקיעה</div><div class="v"><span class="num">${nextDays}</span> ימים</div><div class="s">עד <span class="num">${fmtDate(nextEnd)}</span></div></div>` : ""}
+  </section>`;
+
+  if (alerts.length) {
+    h += `<h2>התראות</h2><div class="alerts">` + alerts.map((a) => `
+      <div class="alert ${esc(a.severity)}"><span class="badge ${esc(a.severity)}">${esc(L.sev[a.severity] || a.severity)}</span><div class="msg">${esc(a.message)}</div></div>`).join("") + `</div>`;
+  }
+
+  // charts
+  const byCompany = {};
+  active.forEach((p) => (byCompany[p.insuranceCompany] = (byCompany[p.insuranceCompany] || 0) + p.premium.monthlyNis));
+  const companies = Object.entries(byCompany).sort((a, b) => b[1] - a[1]);
+  const maxC = Math.max(...companies.map((x) => x[1]), 1);
+  const types = [...new Set(active.map((p) => p.subCategory))];
+  const typeColor = (t) => COLORS[types.indexOf(t) % COLORS.length];
+  const maxV = Math.max(...vlist.map((v) => v.monthly), 1);
+
+  h += `<h2>תמונת מצב</h2><div class="charts">
+    <div class="card chart"><h3>פרמיה חודשית לפי רכב וסוג כיסוי</h3>` +
+    vlist.filter((v) => v.monthly).map((v) => `
+      <div class="bar-row"><div class="name" title="${esc(v.info.vehicleManufacturer)} ${esc(v.info.vehicleModel)}">${esc(v.info.vehicleManufacturer)} ${esc(v.info.vehicleModel.split(" ").slice(0, 2).join(" "))}</div>
+        <div class="track" style="width:${(v.monthly / maxV) * 100}%">${v.activePolicies.map((p) => `<div class="seg" style="width:${(p.premium.monthlyNis / v.monthly) * 100}%;background:${typeColor(p.subCategory)}" title="${esc(p.subCategory)}: ${nis(p.premium.monthlyNis)}"></div>`).join("")}</div>
+        <div class="num">${nis(v.monthly)}</div></div>`).join("") +
+    `<div class="legend">${types.map((t) => `<span><i style="background:${typeColor(t)}"></i>${esc(t)}</span>`).join("")}</div></div>
+    <div class="card chart"><h3>פרמיה חודשית לפי חברת ביטוח</h3>` +
+    companies.map(([n, v], i) => `
+      <div class="bar-row"><div class="name">${esc(n)}</div>
+        <div class="track"><div class="seg" style="width:${(v / maxC) * 100}%;background:${COLORS[i % COLORS.length]}"></div></div>
+        <div class="num">${nis(v)}</div></div>`).join("") + `</div>
+  </div>`;
+
+  // vehicles
+  h += `<h2>הרכבים והפוליסות</h2>`;
+  for (const v of vlist) {
+    const i = v.info;
+    const vAlerts = alerts.filter((a) => a.relatedAssetId === v.plate);
+    const hasActive = v.activePolicies.length > 0;
+    h += `<section class="card vehicle">
+      <div class="vhead">
+        <span class="title">${esc(i.vehicleManufacturer)} ${esc(i.vehicleModel)}</span>
+        <span class="plate">${esc(v.plate)}</span>
+        <div class="vtotal">${hasActive ? `<div class="v num">${nis(v.monthly)}<span class="muted" style="font-size:13px;font-weight:400"> / חודש</span></div>` : `<span class="badge gray">ללא כיסוי פעיל</span>`}</div>
+      </div>
+      <div class="vmeta">
+        ${i.modelYear ? `<span class="badge gray">שנת ייצור <span class="num">${esc(i.modelYear)}</span></span>` : ""}
+        ${i.engineType ? `<span class="badge gray">${esc(L.engine[i.engineType] || i.engineType)}</span>` : ""}
+        ${i.ownershipType ? `<span class="badge gray">${esc(L.owner[i.ownershipType] || i.ownershipType)}</span>` : ""}
+        ${i.carCode ? `<span class="badge gray">קוד רכב <span class="num">${esc(i.carCode)}</span></span>` : ""}
+      </div>
+      ${vAlerts.length ? `<div class="valerts">${vAlerts.map((a) => `<div class="alert ${esc(a.severity)}"><span class="badge ${esc(a.severity)}">${esc(L.sev[a.severity] || a.severity)}</span><div class="msg">${esc(a.message)}</div></div>`).join("")}</div>` : ""}
+      <div class="policies">${v.policies.map((p) => policyCard(p, today)).join("")}</div>
+    </section>`;
+  }
+
+  h += `<footer>מקור: ${esc(data.source)} · מזהה בקשה <span class="num">${esc(data.requestId)}</span><br>מוצגות פוליסות רכב בלבד (${motor.length} מתוך ${data.policies.length} פוליסות בקובץ)</footer>`;
+  $("#app").innerHTML = h;
+}
+
+function policyCard(p, today) {
+  const isActive = p.status === "ACTIVE";
+  const s = utc(p.startDate), e = utc(p.endDate);
+  const pct = Math.min(100, Math.max(0, ((today - s) / (e - s)) * 100));
+  const days = Math.round((e - today) / dayMs);
+  const cls = !isActive ? "" : days <= 14 ? "crit" : days <= 60 ? "warn" : "";
+  const dl = p.driverSpecifications;
+  let drv = "";
+  if (dl) {
+    const bits = [];
+    if (dl.isAnyDriver) bits.push("כל נהג");
+    if (dl.namedDriversCount) bits.push(`${dl.namedDriversCount} נהגים מוגדרים`);
+    if (dl.isYoungDriverIncluded) bits.push("כולל נהג צעיר");
+    if (dl.minDriverAge != null) bits.push(`גיל מינימום ${dl.minDriverAge}`);
+    if (dl.minLicenceYears != null) bits.push(`ותק רישיון ${dl.minLicenceYears}+ שנים`);
+    drv = `<div class="drivers">${bits.map(esc).join(" · ")}</div>`;
+  }
+  const pay = [L.payment[p.premium.paymentMethod] || p.premium.paymentMethod, p.premium.installmentsCount ? p.premium.installmentsCount + " תשלומים" : null].filter(Boolean).join(" · ");
+  const statusBadge = isActive
+    ? `<span class="badge ${days <= 14 ? "crit" : days <= 60 ? "warn" : "ok"}">${days <= 60 ? `נותרו ${days} ימים` : "פעילה"}</span>`
+    : `<span class="badge gray">${esc(L.status[p.status] || p.status)}</span>`;
+  return `<article class="policy ${isActive ? "" : "expired"}">
+    <div class="phead"><div><div class="t">${esc(p.subCategory)}</div><div class="pmeta">${esc(p.insuranceCompany)} · <span class="num">${esc(p.policyId)}</span></div></div>${statusBadge}</div>
+    <div class="price"><span class="v num">${nis(p.premium.monthlyNis)}</span><span class="muted">/ חודש</span>${p.premium.annualNis ? `<span class="muted" style="margin-inline-start:auto"><span class="num">${nis(p.premium.annualNis)}</span> / שנה</span>` : ""}</div>
+    <div class="pmeta">${esc(pay)}</div>
+    <div class="term"><div class="dates"><span class="num">${fmtDate(p.startDate)}</span><span class="num">${fmtDate(p.endDate)}</span></div><div class="prog ${cls}"><div style="width:${pct}%"></div></div></div>
+    ${drv}
+    ${p.coverages?.length ? `<ul class="cov">${p.coverages.map((c) => `<li><div class="row"><span class="ck ${c.isCovered ? "" : "no"}">${c.isCovered ? "✓" : "✕"}</span><span class="n">${esc(c.name)}</span></div>${c.sumInsuredNis != null || c.deductibleNis != null ? `<div class="nums">${c.sumInsuredNis != null ? `סכום ביטוח <span class="num">${nis(c.sumInsuredNis)}</span>` : ""}${c.sumInsuredNis != null && c.deductibleNis != null ? " · " : ""}${c.deductibleNis != null ? `השתתפות עצמית <span class="num">${nis(c.deductibleNis)}</span>` : ""}</div>` : ""}</li>`).join("")}</ul>` : `<div class="pmeta" style="margin-top:12px">אין פירוט כיסויים</div>`}
+    <a class="cmp-btn" href="compare.html?file=${encodeURIComponent(current)}&policy=${encodeURIComponent(p.policyId)}">להשוואת ביטוח רכב</a>
+  </article>`;
+}
+
+let FILES = ["data.json", "data2.json"];
+let uploadName = ""; // שם קובץ האקסל כשהמקור הוא העלאה
+let current = FILES[0];
+let cache = {};
+let session = null; // { idNumber, name } — נקבע רק אחרי אימות OTP מדומה
+
+/* ---------- שכבת API מדומה של הר הביטוח ---------- */
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const mockApi = {
+  otp: null, attempts: 0, pending: null,
+  async requestOtp(idNumber, name) {
+    await wait(700);
+    this.otp = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, "0");
+    this.attempts = 0;
+    this.pending = { idNumber, name };
+    return this.otp; // בשירות אמיתי הקוד נשלח ב-SMS; כאן מוצג כהודעה מדומה
+  },
+  async verifyOtp(code) {
+    await wait(600);
+    if (!this.otp) return { ok: false, reason: "expired" };
+    if (++this.attempts > 3) { this.otp = null; return { ok: false, reason: "locked" }; }
+    if (code !== this.otp) return { ok: false, reason: "wrong", left: 3 - this.attempts };
+    this.otp = null;
+    return { ok: true, customer: this.pending };
+  },
+  async fetchPolicies(file) {
+    await wait(500);
+    const r = await fetch(file);
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  },
+};
+
+// הנתונים הם קבצי דוגמה; פרטי הלקוח שהוזנו בהתחברות מוצגים במקום פרטי הקובץ
+function personalize(data) {
+  if (!session || session.guest || session.excel) return data;
+  const [first, ...rest] = session.name.trim().split(/\s+/);
+  return { ...data, customer: { ...data.customer, idNumber: session.idNumber, firstName: first, lastName: rest.join(" ") } };
+}
+
+/* ---------- מסכי התחברות ---------- */
+const DEMO_NOTE = `<div class="demo-note">מצב הדגמה · אין חיבור אמיתי להר הביטוח, כל הפרטים והקודים הם דמה</div>`;
+const setBar = (on) => { $("#tabsBar").hidden = !on; };
+
+function saveSession() { try { sessionStorage.setItem("harSession", JSON.stringify(session)); sessionStorage.setItem("harTab", current); } catch (e) {} }
+
+function enterGuest() {
+  session = { guest: true }; cache = {};
+  history.replaceState(null, "", "#guest");
+  buildTabs();
+  let tab = null; try { tab = sessionStorage.getItem("harTab"); } catch (e) {}
+  show(FILES.includes(tab) ? tab : FILES[0]);
+}
+
+function showLogin(err = "") {
+  session = null; cache = {}; setBar(false);
+  try { sessionStorage.removeItem("harSession"); } catch (e) {}
+  history.replaceState(null, "", location.pathname + location.search);
+  $("#app").innerHTML = `<div class="card login">
+    <h1>התחברות להר הביטוח</h1>${DEMO_NOTE}
+    <p class="muted">הזינו פרטי לקוח דמה כדי לדמות משיכת פוליסות הרכב דרך שירות ה-API.</p>
+    <form id="f1" novalidate>
+      <label>שם הלקוח<input id="name" autocomplete="off" placeholder="לדוגמה: אלכס כהן" value="${esc(window.RivoAuth?.user()?.name || "אלכס כהן")}"></label>
+      <label>תעודת זהות (דמה)<input id="idn" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות" value="${esc(window.RivoAuth?.user()?.idNumber || "012345678")}" class="ltr"></label>
+      <div class="form-err" id="e1" role="alert">${esc(err)}</div>
+      <button class="pick" id="b1" type="submit">שליחת קוד אימות</button>
+    </form>
+    <div class="links" style="justify-content:center"><button class="link" id="guest" type="button">כניסה ללא זיהוי (נתוני דוגמה)</button><a class="link" href="home.html">דף הבית</a></div></div>`;
+  $("#guest").onclick = enterGuest;
+  $("#f1").onsubmit = async (e) => {
+    e.preventDefault();
+    const name = $("#name").value.trim(), idn = $("#idn").value.trim();
+    if (name.length < 2) return ($("#e1").textContent = "נא להזין שם לקוח");
+    if (!/^\d{9}$/.test(idn)) return ($("#e1").textContent = "תעודת זהות דמה חייבת להכיל 9 ספרות");
+    $("#b1").disabled = true; $("#b1").textContent = "שולח…";
+    showOtp(await mockApi.requestOtp(idn, name));
+  };
+  $("#name").focus();
+}
+
+// מדמה השלמה אוטומטית של הקוד מה-SMS: הקוד "מוקלד" לשדה בלי התערבות המשתמש
+function autofillOtp(input, code, submitBtn) {
+  if (!input || !code) return;
+  let i = 0;
+  setTimeout(function step() {
+    if (!input.isConnected || input.value !== code.slice(0, i)) return; // המסך התחלף או שהמשתמש התחיל להקליד
+    if (i === code.length) return void submitBtn?.focus();
+    input.value = code.slice(0, ++i);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    setTimeout(step, 90);
+  }, i ? 90 : 900);
+}
+
+let resendTimer;
+function showOtp(code, err = "") {
+  const { idNumber } = mockApi.pending;
+  $("#app").innerHTML = `<div class="card login">
+    <h1>אימות קוד חד-פעמי</h1>${DEMO_NOTE}
+    <div class="sms" role="status"><b>הודעת SMS מדומה</b><br>קוד האימות שלך להר הביטוח: <span class="num sms-code">${esc(code)}</span></div>
+    <p class="muted">שלחנו קוד בן 6 ספרות עבור ת״ז <span class="num">${esc(idNumber)}</span>. הזינו אותו כאן.</p>
+    <form id="f2" novalidate>
+      <label>קוד OTP<input id="otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••" class="ltr otp"></label>
+      <div class="form-err" id="e2" role="alert">${esc(err)}</div>
+      <button class="pick" id="b2" type="submit">אימות והתחברות</button>
+    </form>
+    <div class="links"><button class="link" id="resend" type="button" disabled>שליחה מחדש</button><button class="link" id="back" type="button">החלפת פרטים</button></div></div>`;
+  let left = 30;
+  const r = $("#resend"); clearInterval(resendTimer);
+  const tick = () => { r.textContent = left > 0 ? `שליחה מחדש (${left})` : "שליחה מחדש"; r.disabled = left > 0; };
+  tick(); resendTimer = setInterval(() => { left--; tick(); if (left <= 0) clearInterval(resendTimer); }, 1000);
+  r.onclick = async () => { const { idNumber: i, name } = mockApi.pending; r.disabled = true; showOtp(await mockApi.requestOtp(i, name)); };
+  $("#back").onclick = () => { clearInterval(resendTimer); showLogin(); };
+  $("#otp").oninput = (e) => (e.target.value = e.target.value.replace(/\D/g, ""));
+  $("#f2").onsubmit = async (e) => {
+    e.preventDefault();
+    const v = $("#otp").value.trim();
+    if (v.length !== 6) return ($("#e2").textContent = "קוד OTP מורכב מ-6 ספרות");
+    $("#b2").disabled = true; $("#b2").textContent = "מאמת…";
+    const res = await mockApi.verifyOtp(v);
+    if (res.ok) { clearInterval(resendTimer); return connect(res.customer); }
+    if (res.reason === "wrong") {
+      $("#e2").textContent = `קוד שגוי. נותרו ${res.left} ניסיונות`;
+      $("#b2").disabled = false; $("#b2").textContent = "אימות והתחברות";
+      $("#otp").value = ""; $("#otp").focus();
+    } else {
+      showOtp(await mockApi.requestOtp(mockApi.pending.idNumber, mockApi.pending.name), "הקוד פג תוקף או נחסם. נשלח קוד חדש");
+    }
+  };
+  $("#otp").focus();
+  autofillOtp($("#otp"), code, $("#b2"));
+}
+
+async function connect(customer) {
+  const steps = ["מאמת זהות מול שירות ההזדהות", "יוצר חיבור מאובטח ל-API של הר הביטוח", "מושך פוליסות רכב עבור הלקוח", "מעבד ומסכם את הנתונים"];
+  $("#app").innerHTML = `<div class="card login"><h1>מתחבר להר הביטוח</h1>${DEMO_NOTE}
+    <ul class="steps">${steps.map((t, i) => `<li id="st${i}"><span class="dot"></span>${t}</li>`).join("")}</ul></div>`;
+  session = { idNumber: customer.idNumber, name: customer.name };
+  saveSession();
+  for (let i = 0; i < steps.length; i++) {
+    $("#st" + i).className = "active";
+    if (i === 2) { try { cache[FILES[0]] = await mockApi.fetchPolicies(FILES[0]); } catch (e) { /* show() יציג בחירת קובץ ידנית */ } }
+    else await wait(650);
+    $("#st" + i).className = "done";
+  }
+  await wait(300);
+  buildTabs();
+  show(FILES[0]);
+}
+
+/* ---------- טאבים והצגת נתונים ---------- */
+function buildTabs() {
+  setBar(true);
+  const home = `<a class="link" href="home.html">דף הבית</a>`;
+  const who = session.excel ? `מקור: קובץ אקסל${home}`
+    : session.guest ? `מצב אורח (ללא זיהוי)<button class="link" id="logout" type="button">התחברות</button>${home}`
+    : `${esc(session.name)} · <span class="num">${esc(session.idNumber)}</span><button class="link" id="logout" type="button">התנתקות</button>${home}`;
+  $("#tabs").innerHTML = FILES.map((f) => `<button role="tab" data-file="${f}" aria-selected="false">${esc(f === "upload" ? uploadName : f)}</button>`).join("") +
+    `<span class="who">${who}</span>`;
+}
+$("#tabs").onclick = (e) => {
+  if (e.target.closest("#logout")) return showLogin();
+  const b = e.target.closest("button[data-file]"); if (b) show(b.dataset.file);
+};
+
+function showPicker(file, msg) {
+  $("#app").innerHTML = `<div class="card err"><h2 style="margin-top:0">${esc(msg)}</h2><p class="muted">הדפדפן חוסם קריאה אוטומטית של הקובץ כשהעמוד נפתח ישירות מהדיסק. בחרו את ${esc(file)} ידנית, או הריצו שרת מקומי בתיקייה (<code>python -m http.server</code>).</p><button class="pick" id="pickBtn">בחירת ${esc(file)}</button></div>`;
+  $("#pickBtn").onclick = () => $("#picker").click();
+}
+$("#picker").onchange = async (e) => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  const file = current;
+  try { cache[file] = JSON.parse(await f.text()); if (file === current) render(personalize(cache[file])); }
+  catch (err) { showPicker(file, "הקובץ אינו JSON תקין"); }
+};
+
+async function show(file) {
+  current = file;
+  if (session && !session.excel) saveSession();
+  document.querySelectorAll("#tabs button[data-file]").forEach((b) => b.setAttribute("aria-selected", b.dataset.file === file));
+  if (cache[file]) return render(personalize(cache[file]));
+  $("#app").innerHTML = `<div class="err muted">טוען נתונים…</div>`;
+  try {
+    const data = await mockApi.fetchPolicies(file);
+    cache[file] = data;
+    if (file === current && session) render(personalize(data));
+  } catch (err) {
+    if (file === current && session) showPicker(file, `לא ניתן לטעון את ${file}`);
+  }
+}
+
+function enterExcel(up) {
+  session = { excel: true }; FILES = ["upload"]; uploadName = up.uploadName || "קובץ אקסל"; cache = { upload: up };
+  buildTabs();
+  show("upload");
+}
+
+(function init() {
+  // מקור הנתונים נבחר בדף הבית: קובץ אקסל שהועלה או התחברות דרך ה-API
+  let up = null;
+  try { if (sessionStorage.getItem("harSource") === "excel") up = JSON.parse(sessionStorage.getItem("harUpload")); } catch (e) {}
+  if (up && up.policies) return enterExcel(up);
+  let saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem("harSession")); } catch (e) {}
+  if (saved && saved.guest) return enterGuest();
+  if (saved && saved.name) {
+    session = saved; buildTabs();
+    let tab = null; try { tab = sessionStorage.getItem("harTab"); } catch (e) {}
+    return show(FILES.includes(tab) ? tab : FILES[0]);
+  }
+  if (location.hash === "#guest") enterGuest(); else showLogin();
+})();
+</script>
+<script src="privacy.js"></script>
+</body>
+</html>

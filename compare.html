@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="auth.js" data-require></script>
+<title>השוואת ביטוח רכב</title>
+<link rel="stylesheet" href="loader.css">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f5f4f0; --card: #ffffff; --ink: #1f2328; --muted: #666a70; --line: #dddad2;
+    --accent: #0f5a63; --accent-soft: #e8f0f0;
+    --ok: #1f6a44; --ok-soft: #e7f0ea;
+    --warn: #8a5300; --warn-soft: #f5edd9;
+    --crit: #a3312a; --crit-soft: #f4e5e2;
+    --info: #0f5a63; --info-soft: #e8f0f0;
+    --s1: #0f5a63; --s2: #b8651b; --s3: #56668a; --s4: #8b7d2f; --s5: #94486a;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", "Heebo", Arial, sans-serif; font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 20px 16px 56px; }
+  a.back { color: var(--accent); text-decoration: none; font-size: 14px; }
+  a.back:hover { text-decoration: underline; }
+  h1 { font-size: 24px; margin: 10px 0 0; }
+  h2 { font-size: 18px; margin: 28px 0 12px; }
+  .muted { color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+  .demo-note { margin: 12px 0 0; padding: 8px 14px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); font-size: 13px; font-weight: 600; }
+
+  .basis { padding: 18px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px 28px; }
+  .basis h3 { margin: 0 0 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
+  .basis .kv { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; font-size: 14px; border-bottom: 1px dashed var(--line); }
+  .basis .kv:last-child { border-bottom: 0; }
+  .basis .kv span:first-child { color: var(--muted); }
+  .plate { direction: ltr; display: inline-flex; align-items: center; gap: 6px; background: #ffd936; color: #111; border: 2px solid #111; border-radius: 6px; padding: 0 8px; font-weight: 700; letter-spacing: 1.5px; font-size: 13px; }
+  .plate::before { content: ""; width: 6px; height: 13px; background: #1d4fd8; border-radius: 2px; }
+
+  .bar-row { display: grid; grid-template-columns: 130px 1fr auto; gap: 10px; align-items: center; margin: 8px 0; font-size: 13.5px; }
+  .track { height: 16px; background: var(--line); border-radius: 8px; overflow: hidden; direction: rtl; }
+  .fill { height: 100%; background: var(--accent); border-radius: 8px; }
+  .fill.cur { background: var(--muted); }
+  .fill.best { background: var(--ok); }
+  .chart { padding: 16px 20px; }
+
+  .offers { display: grid; gap: 12px; }
+  .offer { display: grid; grid-template-columns: 1.3fr 1.6fr auto; gap: 12px 24px; align-items: center; padding: 16px 20px; }
+  .offer.best { border: 2px solid var(--ok); }
+  .offer.current { background: var(--accent-soft); }
+  .co { font-size: 17px; font-weight: 700; }
+  .price .v { font-size: 24px; font-weight: 700; }
+  .save { font-size: 13px; font-weight: 600; }
+  .save.good { color: var(--ok); }
+  .save.bad { color: var(--crit); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip { padding: 1px 10px; border-radius: 999px; font-size: 12px; background: var(--line); color: var(--muted); }
+  .chip.yes { background: var(--ok-soft); color: var(--ok); }
+  .badge { display: inline-block; padding: 1px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; margin-inline-start: 6px; vertical-align: 2px; }
+  .badge.best { background: var(--ok); color: #fff; }
+  .badge.cur { background: var(--accent); color: #fff; }
+  .specs { font-size: 13px; color: var(--muted); }
+  button.act { font: inherit; padding: 9px 18px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; white-space: nowrap; }
+  button.act:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); cursor: default; }
+  .err { padding: 28px; text-align: center; }
+  footer { margin-top: 28px; text-align: center; color: var(--muted); font-size: 12.5px; }
+  @media (max-width: 720px) { .offer { grid-template-columns: 1fr; } .bar-row { grid-template-columns: 90px 1fr auto; } }
+  .row-h { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+  button.ghost { font: inherit; font-size: 13.5px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  button.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .good { color: var(--ok); } .bad { color: var(--crit); }
+  .chip.up { background: var(--crit-soft); color: var(--crit); }
+  .chip.down { background: var(--ok-soft); color: var(--ok); }
+
+  .stepper { list-style: none; display: flex; gap: 6px; padding: 0; margin: 18px 0 14px; overflow-x: auto; }
+  .stepper li { flex: 1 1 0; min-width: 88px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12.5px; color: var(--muted); position: relative; }
+  .stepper li::before { content: ""; position: absolute; top: 14px; inset-inline: -50% 50%; height: 2px; background: var(--line); z-index: 0; }
+  .stepper li:first-child::before { display: none; }
+  .stepper li.done::before, .stepper li.cur::before { background: var(--accent); }
+  .stepper .n { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--card); border: 2px solid var(--line); font-weight: 700; z-index: 1; }
+  .stepper li.cur { color: var(--ink); font-weight: 600; }
+  .stepper li.cur .n { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .stepper li.done .n { border-color: var(--ok); background: var(--ok); color: #fff; }
+  .wiz { padding: 22px 24px; }
+  .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 24px; }
+  .fld { display: block; border: 0; padding: 0; margin: 0; min-width: 0; }
+  .fld > span, .fld > legend { display: block; font-size: 13px; color: var(--muted); margin-bottom: 5px; padding: 0; }
+  .fld input:not([type=radio]):not([type=checkbox]), .fld select { display: block; width: 100%; padding: 10px 12px; font: inherit; font-size: 15px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+  .fld input:focus, .fld select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .fld input.ltr { text-align: start; direction: ltr; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .ferr { color: var(--crit); font-size: 12.5px; margin-top: 4px; }
+  fieldset.fld { grid-column: 1 / -1; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill input { position: absolute; opacity: 0; pointer-events: none; }
+  .pill span { display: inline-block; padding: 8px 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; font-size: 14px; }
+  .pill input:checked + span { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .pill input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .fld.check { display: flex; align-items: center; gap: 10px; grid-column: 1 / -1; }
+  .fld.check > span { margin: 0; font-size: 14px; color: var(--ink); }
+  .fld.check input { width: 18px; height: 18px; flex: none; }
+  .consent { margin-top: 18px; padding: 12px 14px; background: var(--accent-soft); border-radius: 10px; }
+  .nav { display: flex; justify-content: space-between; margin-top: 24px; gap: 10px; }
+  .sum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px 28px; }
+  .sum-grid h3 { margin: 0 0 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
+  .sum-grid .kv { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; font-size: 14px; border-bottom: 1px dashed var(--line); }
+  .sum-grid .kv span:first-child { color: var(--muted); }
+  @media (max-width: 520px) { .stepper .t { display: none; } .stepper li { min-width: 0; } .wiz { padding: 18px 16px; } }
+  .sms { margin: 4px 0 14px; padding: 12px 14px; border-radius: 12px; background: var(--ok-soft); color: var(--ink); border: 1px dashed var(--ok); font-size: 14px; }
+  .sms-code { font-size: 22px; font-weight: 700; letter-spacing: 4px; color: var(--ok); }
+  .fld input.otp { letter-spacing: 8px; font-size: 22px; text-align: center; }
+  .links { display: flex; justify-content: space-between; margin-top: 14px; max-width: 320px; }
+  button.link { font: inherit; font-size: 13px; background: none; border: 0; color: var(--accent); cursor: pointer; padding: 4px 2px; text-decoration: underline; }
+  button.link:disabled { color: var(--muted); cursor: default; text-decoration: none; }
+  button.act:disabled { opacity: .7; }
+
+  .odet { grid-column: 1 / -1; border-top: 1px dashed var(--line); padding-top: 4px; }
+  .odet summary { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 8px; padding: 6px 2px; color: var(--accent); font-weight: 600; font-size: 14px; user-select: none; }
+  .odet summary::-webkit-details-marker { display: none; }
+  .odet summary::after { content: ""; width: 8px; height: 8px; border-inline-end: 2px solid currentColor; border-block-end: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .2s; }
+  .odet[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+  .odet summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .det-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0 32px; margin-top: 6px; }
+  .drow { display: flex; justify-content: space-between; gap: 14px; padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: 13.5px; }
+  .drow .dl { color: var(--muted); flex: none; max-width: 48%; }
+  .drow .dv { text-align: end; }
+  .drow .dv.yes { color: var(--ok); }
+  .drow .dv.no { color: var(--muted); }
+  dialog.tdlg { border: 0; border-radius: 20px; padding: 22px 24px 24px; width: min(520px, 92vw); background: var(--card); color: var(--ink); box-shadow: 0 24px 70px rgba(30,45,80,.28); }
+  dialog.tdlg::backdrop { background: rgba(38,48,69,.38); backdrop-filter: blur(2px); }
+  .tdlg-h { display: flex; justify-content: space-between; align-items: center; }
+  .tdlg-h h2 { margin: 0; font-size: 20px; }
+  .tcard { display: grid; gap: 4px; width: 100%; margin-top: 12px; padding: 14px 16px; text-align: start; font: inherit; color: var(--ink); background: var(--card); border: 2px solid var(--line); border-radius: 14px; cursor: pointer; transition: border-color .15s, background .15s; }
+  .tcard:hover, .tcard:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none; }
+  .tcard.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .tcard .tt { font-size: 17px; font-weight: 700; }
+  .tcard .td { font-size: 13.5px; color: var(--muted); }
+  .tcard .tp { font-size: 14px; color: var(--ok); font-weight: 600; margin-top: 2px; }
+
+  /* ---- בסיס ---- */
+  body { background: var(--bg); }
+  h1 { font-size: 24px; font-weight: 700; letter-spacing: 0; }
+  h2 { font-size: 16px; font-weight: 700; margin: 34px 0 12px; padding-top: 10px; border-top: 2px solid var(--ink); }
+  .card h2, .wiz h2, .err h2, .tdlg h2, .login h2 { border-top: 0; padding-top: 0; }
+  .row-h { border-top: 2px solid var(--ink); margin-top: 34px; padding-top: 10px; align-items: baseline; }
+  .row-h h2 { border: 0; margin: 0; padding: 0; }
+  .card { border-radius: 6px; box-shadow: none; }
+  button.act, button.pick { border-radius: 4px; box-shadow: none; background: var(--accent); border-color: var(--accent); }
+  button.ghost { border-radius: 4px; }
+  .badge, .chip { border-radius: 3px; font-weight: 500; }
+  .badge.CRITICAL, .badge.HIGH, .badge.INFO { background: none; padding: 0; font-weight: 700; min-width: 3.4em; }
+  .badge.CRITICAL { color: var(--crit); } .badge.HIGH { color: var(--warn); } .badge.INFO { color: var(--accent); }
+  .badge.ok, .badge.warn, .badge.crit { background: none; border: 1px solid currentColor; }
+  .badge.gray { background: none; border: 1px solid var(--line); color: var(--muted); }
+  .demo-note { background: none; border: 0; border-inline-start: 3px solid var(--warn); border-radius: 0; padding: 2px 10px; color: var(--ink); font-weight: 400; }
+  .login { border-radius: 6px; }
+  .login input, .fld input:not([type=radio]):not([type=checkbox]), .fld select { border-radius: 4px; }
+  .sms { border-radius: 4px; }
+  .offer { border-radius: 6px; transition: none; }
+  .offer:hover { box-shadow: none; }
+  .offer.best { border: 1px solid var(--ok); }
+  .track { height: 8px; border-radius: 2px; }
+  .fill { border-radius: 0; }
+  .badge.best { background: none; color: var(--ok); border: 1px solid currentColor; }
+  .badge.cur { background: none; color: var(--accent); border: 1px solid currentColor; }
+  .chip { background: none; border: 1px solid var(--line); color: var(--muted); }
+  .chip.yes, .chip.down { background: none; color: var(--ok); border-color: currentColor; }
+  .chip.up { background: none; color: var(--crit); border-color: currentColor; }
+  .stepper .n { border-radius: 4px; }
+  .wiz { border-radius: 6px; }
+  .pill span { border-radius: 4px; background: var(--card); }
+  .consent { border-radius: 4px; }
+  dialog.tdlg { border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,.18); }
+  dialog.tdlg::backdrop { background: rgba(20,20,20,.4); backdrop-filter: none; }
+  .tcard { border-radius: 6px; }
+  .fgroup { grid-column: 1 / -1; padding-top: 8px; border-top: 1px solid var(--line); font-weight: 700; font-size: 14px; }
+  .fgroup:first-child { border-top: 0; padding-top: 0; }
+  .pay-note { grid-column: 1 / -1; margin: 0; padding: 10px 14px; background: var(--accent-soft); border-radius: 4px; font-size: 13.5px; }
+  .back-btn { padding: 0; }
+  .ohead { display: flex; flex-wrap: wrap; gap: 8px 32px; padding: 14px 18px; margin: 14px 0 0; font-size: 14px; }
+  .ohead .muted { font-size: 12px; }
+  .proc { max-width: 520px; margin: 40px auto; padding: 26px 26px 20px; }
+  .proc h1 { margin: 0 0 12px; font-size: 20px; }
+  .osteps { list-style: none; margin: 0; padding: 0; }
+  .osteps li { display: flex; align-items: center; gap: 12px; padding: 9px 0; color: var(--muted); border-bottom: 1px dashed var(--line); }
+  .osteps li:last-child { border-bottom: 0; }
+  .osteps .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
+  .osteps li.active { color: var(--ink); }
+  .osteps li.active .dot { border-color: var(--accent); border-top-color: transparent; animation: ospin .8s linear infinite; }
+  .osteps li.done { color: var(--ink); }
+  .osteps li.done .dot { background: var(--ok); border-color: var(--ok); }
+  @keyframes ospin { to { transform: rotate(360deg); } }
+  .confirm { padding: 20px 24px; margin-top: 14px; }
+  .next { margin: 0; padding-inline-start: 20px; font-size: 14px; line-height: 1.8; }
+  .odet.api summary { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .api-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 6px 0 10px; font-size: 13px; }
+  .api-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; padding-bottom: 8px; }
+  .api-t { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+  .api pre { direction: ltr; text-align: left; margin: 0; padding: 12px; background: var(--soft, #f3f5f8); border: 1px solid var(--line); border-radius: 6px; font: 12px/1.5 Consolas, "Courier New", monospace; overflow: auto; max-height: 320px; }
+  .offer.declined { background: var(--soft, #f3f5f8); }
+  .rv-progress { margin: 0 0 14px; font-size: 14px; color: var(--muted); }
+  .rvp-t { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .offer.fresh { animation: rvIn .5s ease both; }
+  @keyframes rvIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .offer.fresh { animation: none; } }
+  dialog.apilayer { width: min(520px, calc(100vw - 24px)); max-width: none; max-height: none; overflow: visible; padding: 0; border: 0; background: transparent; }
+  dialog.apilayer::backdrop { background: rgba(20, 30, 45, .6); }
+  dialog.apilayer, dialog.apilayer:focus, dialog.apilayer:focus-visible { outline: none; }
+</style>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="header.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<script src="brand.js"></script>
+<div class="wrap" id="app"><div class="err muted">טוען נתונים…</div></div>
+
+<script src="loader.js"></script>
+<script src="api/insurer-api.js"></script>
+<script src="api/insurers/phoenix.js"></script>
+<script src="api/insurers/harel.js"></script>
+<script src="api/insurers/migdal.js"></script>
+<script src="api/insurers/clal.js"></script>
+<script src="api/insurers/menora.js"></script>
+<script src="api/insurers/yashir.js"></script>
+<script src="api/insurers/shirbit.js"></script>
+<script src="api/insurers/hachshara.js"></script>
+<script src="api/insurers/aig.js"></script>
+<script src="api/insurers/ayalon.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const nis = (n) => "₪" + Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 });
+const fmtDate = (s) => { const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; };
+const L = {
+  payment: { CREDIT_CARD: "כרטיס אשראי", DIRECT_DEBIT: "הוראת קבע" },
+  engine: { GASOLINE: "בנזין", ELECTRIC: "חשמלי", DIESEL: "דיזל", HYBRID: "היברידי" },
+  owner: { PRIVATE: "פרטית", PRIVATE_YOUNG_DRIVER: "פרטית – נהג צעיר" },
+};
+const FILES = ["data.json", "data2.json", "upload"];
+const POOL = InsurerApi.names(); // עשר חברות הביטוח הגדולות (נרשמות בקבצי api/insurers/)
+const KIND_LABEL = { comprehensive: "ביטוח רכב מקיף + חובה", third: "ביטוח רכב צד שלישי + חובה", mandatory: "ביטוח רכב חובה" };
+const KIND_SCALE = { comprehensive: 1, third: 0.35, mandatory: 0.22 };
+const MILEAGE = { lt10: "עד 10,000 ק״מ", "10-20": "10,000–20,000 ק״מ", "20-30": "20,000–30,000 ק״מ", gt30: "מעל 30,000 ק״מ" };
+const PARKING = { garage: "חניה פרטית סגורה", private: "חניה פרטית פתוחה", street: "חניה ברחוב" };
+const DEDUCT = { low: "נמוכה", std: "רגילה", high: "גבוהה" };
+const YN = [["yes", "כן"], ["no", "לא"]];
+
+/* ---------- מחולל דטרמיניסטי (הצעות מדומות יציבות) ---------- */
+function rng(seedStr) {
+  let h = 1779033703 ^ seedStr.length;
+  for (let i = 0; i < seedStr.length; i++) { h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
+  let a = h >>> 0;
+  return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+
+function policyKind(p) {
+  const t = p.subCategory;
+  if (t.includes("מקיף")) return "comprehensive";
+  if (t.includes("צד שלישי")) return "third";
+  return "mandatory";
+}
+
+/* ---------- הגדרת שלבי האשף ---------- */
+const STEPS = [
+  { title: "פרטים אישיים", fields: [
+    { k: "firstName", label: "שם פרטי", type: "text", req: true },
+    { k: "lastName", label: "שם משפחה", type: "text", req: true },
+    { k: "idNumber", label: "תעודת זהות", type: "text", inputmode: "numeric", maxlength: 9, re: /^\d{9}$/, msg: "ת״ז חייבת להכיל 9 ספרות" },
+    { k: "mainAge", label: "גיל הנהג הראשי", type: "number", min: 17, max: 99 },
+    { k: "phone", label: "טלפון נייד", type: "tel", re: /^0\d{8,9}$/, msg: "מספר טלפון לא תקין" },
+    { k: "email", label: "דוא״ל", type: "email", re: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, msg: "כתובת דוא״ל לא תקינה" },
+  ] },
+  { title: "נהגים וותק", fields: [
+    { k: "licenceYears", label: "ותק נהיגה של הנהג הראשי (בשנים)", type: "number", min: 0, max: 80 },
+    { k: "youngestAge", label: "גיל הנהג הצעיר ביותר שינהג ברכב", type: "number", min: 16, max: 99, hint: "אם הנהג היחיד הוא הנהג הראשי, הזינו את גילו" },
+    { k: "driversCount", label: "מספר הנהגים ברכב", type: "number", min: 1, max: 10 },
+    { k: "whoDrives", label: "מי רשאי לנהוג?", type: "radio", opts: [["any", "כל נהג"], ["named", "נהגים מוגדרים בלבד"]] },
+  ] },
+  { title: "היסטוריית תביעות", fields: [
+    { k: "hadClaims", label: "האם הוגשו תביעות ב-3 השנים האחרונות?", type: "radio", opts: YN },
+    { k: "claimsCount", label: "כמה תביעות?", type: "number", min: 1, max: 10, showIf: (a) => a.hadClaims === "yes" },
+    { k: "atFault", label: "האם הייתה תביעה באשמת הנהג?", type: "radio", opts: YN, showIf: (a) => a.hadClaims === "yes" },
+    { k: "cancelled", label: "האם חברת ביטוח סירבה לבטח אותך או ביטלה פוליסה בעבר?", type: "radio", opts: YN },
+    { k: "convictions", label: "האם הורשעת בעבירות תנועה חמורות ב-3 השנים האחרונות?", type: "radio", opts: YN },
+  ] },
+  { title: "הרכב והכיסוי", fields: [
+    { k: "coverage", label: "סוג הכיסוי המבוקש", type: "radio", opts: [["comprehensive", "מקיף"], ["third", "צד ג׳"], ["mandatory", "חובה בלבד"]] },
+    { k: "usage", label: "שימוש ברכב", type: "radio", opts: [["private", "פרטי"], ["business", "פרטי + עבודה"]] },
+    { k: "mileage", label: "קילומטראז׳ שנתי משוער", type: "select", opts: Object.entries(MILEAGE) },
+    { k: "parking", label: "חניית הרכב בלילה", type: "select", opts: Object.entries(PARKING), showIf: (a) => a.coverage !== "mandatory" },
+    { k: "security", label: "מותקנת מערכת מיגון / איתור", type: "checkbox", showIf: (a) => a.coverage === "comprehensive" },
+    { k: "deductible", label: "השתתפות עצמית מועדפת", type: "radio", opts: Object.entries(DEDUCT), showIf: (a) => a.coverage !== "mandatory" },
+    { k: "startDate", label: "תאריך תחילת ביטוח רצוי", type: "date", req: true },
+  ] },
+  { title: "סיכום ואישור", summary: true },
+  { title: "אימות טלפון", otp: true },
+];
+
+function defaults(data, p, session) {
+  const c = data.customer, d = p.driverSpecifications, a = p.assetDetails || {};
+  const now = new Date();
+  const age = c.birthDate ? Math.floor((now - new Date(c.birthDate)) / 31557600000) : "";
+  let first = c.firstName, last = c.lastName, idn = c.idNumber;
+  if (session && !session.guest && session.name) {
+    const [f, ...r] = session.name.trim().split(/\s+/);
+    first = f; last = r.join(" "); idn = session.idNumber;
+  }
+  const today = now.toISOString().slice(0, 10);
+  return {
+    firstName: first, lastName: last, idNumber: idn, mainAge: String(age), phone: c.phone || "", email: c.email || "",
+    licenceYears: c.drivingLicenceYear ? String(now.getFullYear() - c.drivingLicenceYear) : "",
+    youngestAge: String(d?.minDriverAge ?? age), driversCount: String(d?.namedDriversCount ?? 1),
+    whoDrives: d?.isAnyDriver ? "any" : "named",
+    hadClaims: "no", claimsCount: "1", atFault: "no", cancelled: "no", convictions: "no",
+    coverage: policyKind(p), usage: "private", mileage: "10-20", parking: "private", security: false, deductible: "std",
+    startDate: p.endDate > today ? p.endDate : today,
+    consent: false,
+  };
+}
+
+/* ---------- אשף ---------- */
+let CTX = null; // { file, data, p, ans, step, errs }
+const storeKey = () => `harQuote:${CTX.file}:${CTX.p.policyId}`;
+const save = (done) => { try { sessionStorage.setItem(storeKey(), JSON.stringify({ ans: CTX.ans, done })); } catch (e) {} };
+
+const visible = (st, ans) => st.fields.filter((f) => !f.showIf || f.showIf(ans));
+
+function fieldHtml(f, ans, errs) {
+  if (f.type === "heading") return `<div class="fgroup">${esc(f.label)}</div>`;
+  const v = ans[f.k], err = errs[f.k] ? `<div class="ferr">${esc(errs[f.k])}</div>` : "";
+  const hint = f.hint ? `<div class="hint">${esc(f.hint)}</div>` : "";
+  if (f.type === "radio") return `<fieldset class="fld"><legend>${esc(f.label)}</legend><div class="pills">${f.opts.map(([val, lab]) =>
+    `<label class="pill"><input type="radio" name="${f.k}" data-k="${f.k}" value="${esc(val)}" ${v === val ? "checked" : ""}><span>${esc(lab)}</span></label>`).join("")}</div>${err}</fieldset>`;
+  if (f.type === "select") return `<label class="fld"><span>${esc(f.label)}</span><select data-k="${f.k}">${f.opts.map(([val, lab]) => `<option value="${esc(val)}" ${v === val ? "selected" : ""}>${esc(lab)}</option>`).join("")}</select>${err}</label>`;
+  if (f.type === "checkbox") return `<label class="fld check"><input type="checkbox" data-k="${f.k}" ${v ? "checked" : ""}><span>${esc(f.label)}</span></label>`;
+  return `<label class="fld"><span>${esc(f.label)}</span><input data-k="${f.k}" type="${f.type}" value="${esc(v)}"
+    ${f.inputmode ? `inputmode="${f.inputmode}"` : ""} ${f.maxlength ? `maxlength="${f.maxlength}"` : ""} ${f.min != null ? `min="${f.min}" max="${f.max}"` : ""}
+    ${["tel", "email"].includes(f.type) || f.inputmode ? 'dir="ltr" class="ltr"' : ""} autocomplete="off">${hint}${err}</label>`;
+}
+
+function summaryHtml(a) {
+  const a2 = CTX.p.assetDetails || {};
+  const row = (k, v) => `<div class="kv"><span>${k}</span><span>${v}</span></div>`;
+  const yn = (v) => (v === "yes" ? "כן" : "לא");
+  const c = a.coverage !== "mandatory";
+  return `<div class="sum-grid">
+    <div><h3>לקוח</h3>${row("שם", esc(a.firstName + " " + a.lastName))}${row("ת״ז", `<span class="num">${esc(a.idNumber)}</span>`)}${row("טלפון", `<span class="num">${esc(a.phone)}</span>`)}${row("דוא״ל", `<span class="num">${esc(a.email)}</span>`)}</div>
+    <div><h3>נהגים</h3>${row("גיל הנהג הראשי", esc(a.mainAge))}${row("ותק נהיגה", esc(a.licenceYears) + " שנים")}${row("הנהג הצעיר ביותר", "גיל " + esc(a.youngestAge))}${row("נהגים", esc(a.driversCount) + " · " + (a.whoDrives === "any" ? "כל נהג" : "מוגדרים"))}</div>
+    <div><h3>תביעות</h3>${row("תביעות ב-3 שנים", a.hadClaims === "yes" ? esc(a.claimsCount) : "אין")}${a.hadClaims === "yes" ? row("באשמת הנהג", yn(a.atFault)) : ""}${row("סירוב / ביטול פוליסה", yn(a.cancelled))}${row("עבירות חמורות", yn(a.convictions))}</div>
+    <div><h3>רכב וכיסוי</h3>${row("רכב", esc((a2.vehicleManufacturer || "") + " " + (a2.vehicleModel || "")))}${row("כיסוי", esc(KIND_LABEL[a.coverage]))}${row("שימוש", a.usage === "private" ? "פרטי" : "פרטי + עבודה")}${row("ק״מ שנתי", esc(MILEAGE[a.mileage]))}${c ? row("חניה", esc(PARKING[a.parking])) : ""}${c ? row("השתתפות עצמית", esc(DEDUCT[a.deductible])) : ""}${row("תחילת ביטוח", `<span class="num">${esc(fmtDate(a.startDate))}</span>`)}</div>
+  </div>
+  <label class="fld check consent"><input type="checkbox" data-k="consent" ${a.consent ? "checked" : ""}><span>אני מאשר/ת שהפרטים נכונים ומסכים/ה להעברתם לחברות הביטוח לצורך קבלת הצעות (הדגמה בלבד)</span></label>
+  ${CTX.errs.consent ? `<div class="ferr">${esc(CTX.errs.consent)}</div>` : ""}`;
+}
+
+/* ---------- אימות טלפון (OTP מדומה) ---------- */
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const PHONE_RE = /^05\d{8}$/;
+let resendTimer;
+const maskPhone = (ph) => `${ph.slice(0, 3)}-***-${ph.slice(-4)}`;
+
+function otpHtml() {
+  const o = CTX.otp, e = CTX.errs;
+  if (!o?.code) return `
+    <p class="muted">לפני הצגת ההצעות נאמת את מספר הטלפון בקוד חד-פעמי. הזינו מספר טלפון נייד <b>דמה</b>.</p>
+    <form id="otpSend" novalidate>
+      <label class="fld" style="max-width:320px"><span>מספר טלפון נייד (דמה)</span>
+        <input data-k="phone" type="tel" inputmode="numeric" dir="ltr" class="ltr" maxlength="10" placeholder="05XXXXXXXX" value="${esc(CTX.ans.phone)}" autocomplete="off">
+        ${e.phone ? `<div class="ferr">${esc(e.phone)}</div>` : ""}</label>
+      <button type="submit" class="act" id="otpSendBtn" style="margin-top:14px">שליחת קוד אימות</button>
+    </form>`;
+  return `
+    <div class="sms" role="status"><b>הודעת SMS מדומה</b> אל <span class="num">${esc(maskPhone(o.phone))}</span><br>קוד האימות שלך להשוואת ביטוח רכב: <span class="num sms-code">${esc(o.code)}</span></div>
+    <p class="muted">הזינו את הקוד בן 6 הספרות. הקוד תקף ל-2 דקות.</p>
+    <form id="otpVerify" novalidate>
+      <label class="fld" style="max-width:320px"><span>קוד OTP</span>
+        <input id="otpCode" type="text" inputmode="numeric" maxlength="6" dir="ltr" class="ltr otp" placeholder="••••••" autocomplete="one-time-code">
+        <div class="ferr" id="otpErr">${esc(e.otp || "")}</div></label>
+      <button type="submit" class="act" id="otpVerifyBtn">אימות והצגת הצעות</button>
+    </form>
+    <div class="links"><button type="button" class="link" id="otpResend" disabled>שליחה מחדש</button><button type="button" class="link" id="otpChange">החלפת מספר</button></div>`;
+}
+
+// מדמה השלמה אוטומטית של הקוד מה-SMS: הקוד "מוקלד" לשדה בלי התערבות המשתמש
+function autofillOtp(input, code, submitBtn) {
+  if (!input || !code) return;
+  let i = 0;
+  setTimeout(function step() {
+    if (!input.isConnected || input.value !== code.slice(0, i)) return; // המסך התחלף או שהמשתמש התחיל להקליד
+    if (i === code.length) return void submitBtn?.focus();
+    input.value = code.slice(0, ++i);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    setTimeout(step, 90);
+  }, i ? 90 : 900);
+}
+
+function startResendTimer() {
+  clearInterval(resendTimer);
+  const b = $("#otpResend"); if (!b || !CTX.otp?.sentAt) return;
+  const tick = () => {
+    const left = Math.max(0, 30 - Math.floor((Date.now() - CTX.otp.sentAt) / 1000));
+    b.textContent = left > 0 ? `שליחה מחדש (${left})` : "שליחה מחדש"; b.disabled = left > 0;
+    if (!left) clearInterval(resendTimer);
+  };
+  tick(); resendTimer = setInterval(tick, 1000);
+  autofillOtp($("#otpCode"), CTX.otp.code, $("#otpVerifyBtn"));
+}
+
+async function sendOtp(phone) {
+  await wait(700);
+  const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, "0");
+  CTX.otp = { code, phone, attempts: 0, sentAt: Date.now(), expires: Date.now() + 120000 };
+  CTX.ans.phone = phone; save(false);
+}
+
+document.addEventListener("submit", async (e) => {
+  if (e.target.id === "otpSend") {
+    e.preventDefault();
+    const ph = (CTX.ans.phone || "").trim();
+    if (!PHONE_RE.test(ph)) { CTX.errs = { phone: "מספר נייד דמה: 10 ספרות שמתחילות ב-05" }; return renderWizard(true); }
+    CTX.errs = {}; $("#otpSendBtn").disabled = true; $("#otpSendBtn").textContent = "שולח…";
+    await sendOtp(ph); renderWizard(true);
+  } else if (e.target.id === "otpVerify") {
+    e.preventDefault();
+    const v = $("#otpCode").value.trim(), o = CTX.otp;
+    const fail = (m) => { CTX.errs = { otp: m }; $("#otpErr").textContent = m; $("#otpVerifyBtn").disabled = false; $("#otpVerifyBtn").textContent = "אימות והצגת הצעות"; };
+    if (v.length !== 6) return ($("#otpErr").textContent = "קוד OTP מורכב מ-6 ספרות");
+    $("#otpVerifyBtn").disabled = true; $("#otpVerifyBtn").textContent = "מאמת…";
+    await wait(600);
+    if (Date.now() > o.expires) { CTX.otp = null; CTX.errs = { phone: "הקוד פג תוקף. שלחו קוד חדש" }; return renderWizard(true); }
+    if (v !== o.code) {
+      if (++o.attempts >= 3) { CTX.otp = null; CTX.errs = { phone: "3 ניסיונות שגויים. שלחו קוד חדש" }; return renderWizard(true); }
+      $("#otpCode").value = ""; $("#otpCode").focus();
+      return fail(`קוד שגוי. נותרו ${3 - o.attempts} ניסיונות`);
+    }
+    clearInterval(resendTimer);
+    CTX.ans.phone = o.phone; CTX.ans.phoneVerified = true; CTX.otp = null; CTX.errs = {};
+    CTX.mode = "results"; save(true); renderResults();
+  }
+});
+document.addEventListener("click", async (e) => {
+  if (e.target.id === "otpChange") { clearInterval(resendTimer); CTX.otp = null; CTX.errs = {}; renderWizard(true); }
+  if (e.target.id === "otpResend") { e.target.disabled = true; await sendOtp(CTX.otp.phone); CTX.errs = {}; renderWizard(true); }
+});
+document.addEventListener("input", (e) => { if (e.target.id === "otpCode") e.target.value = e.target.value.replace(/\D/g, ""); });
+
+function renderWizard(keepScroll) {
+  const { p, ans, step, errs } = CTX, st = STEPS[step], a = p.assetDetails || {};
+  document.title = "פרטים לקבלת הצעה · השוואת ביטוח רכב";
+  $("#app").innerHTML = `
+    <a class="back" href="index.html">חזרה להביטוחים שלי</a>
+    <h1>פרטים לקבלת הצעה</h1>
+    <div class="muted">${esc(a.vehicleManufacturer || "")} ${esc(a.vehicleModel || "")} · <span class="plate">${esc(a.licensePlate || "")}</span></div>
+    <div class="demo-note">הדגמה בלבד · הפרטים נשארים בדפדפן ואינם נשלחים לשום גורם</div>
+    <ol class="stepper">${STEPS.map((s, i) => `<li class="${i === step ? "cur" : i < step ? "done" : ""}"><span class="n">${i < step ? "✓" : i + 1}</span><span class="t">${esc(s.title)}</span></li>`).join("")}</ol>
+    <${st.otp ? "div" : "form"} class="card wiz" ${st.otp ? "" : 'id="wiz" novalidate'}>
+      <h2 style="margin-top:0">שלב ${step + 1} מתוך ${STEPS.length} · ${esc(st.title)}</h2>
+      ${st.otp ? otpHtml() : st.summary ? summaryHtml(ans) : `<div class="fields">${visible(st, ans).map((f) => fieldHtml(f, ans, errs)).join("")}</div>`}
+      <div class="nav">
+        ${step > 0 ? `<button type="button" class="ghost" id="prev">הקודם</button>` : `<span></span>`}
+        ${st.otp ? "" : `<button type="submit" class="act">${st.summary ? "המשך לאימות טלפון" : "המשך"}</button>`}
+      </div>
+    </${st.otp ? "div" : "form"}>`;
+  if (st.otp) startResendTimer();
+  if (!keepScroll) window.scrollTo(0, 0);
+}
+
+function validate() {
+  const st = STEPS[CTX.step], errs = {}, a = CTX.ans;
+  if (st.summary) { if (!a.consent) errs.consent = "יש לאשר כדי להמשיך"; return errs; }
+  for (const f of visible(st, a)) {
+    const v = a[f.k];
+    if (f.type === "radio" || f.type === "checkbox" || f.type === "select") continue;
+    if (v === "" || v == null) { errs[f.k] = "שדה חובה"; continue; }
+    if (f.type === "number") {
+      const n = Number(v);
+      if (!Number.isFinite(n) || n < f.min || n > f.max) errs[f.k] = `הזינו מספר בין ${f.min} ל-${f.max}`;
+    } else if (f.re && !f.re.test(String(v).trim())) errs[f.k] = f.msg;
+  }
+  const y = Number(a.youngestAge), m = Number(a.mainAge), l = Number(a.licenceYears);
+  if (CTX.step === 1) {
+    if (!errs.youngestAge && !errs.licenceYears && l > m - 16) errs.licenceYears = "הוותק גבוה מדי ביחס לגיל הנהג הראשי";
+    if (!errs.youngestAge && y > m && a.driversCount === "1") errs.youngestAge = "גיל הנהג הצעיר לא יכול לעלות על גיל הנהג הראשי כשיש נהג אחד";
+  }
+  return errs;
+}
+
+document.addEventListener("input", (e) => setField(e));
+document.addEventListener("change", (e) => {
+  setField(e);
+  const t = e.target, k = t.dataset?.k;
+  if (!k || !CTX || ["text", "number", "tel", "email", "date", "password"].includes(t.type)) return;
+  if (CTX.mode === "wizard" && STEPS[CTX.step].fields?.some((f) => f.showIf)) renderWizard(true);
+  else if (CTX.mode === "order" && CTX.order.steps[CTX.order.step].fields?.some((f) => f.showIf)) renderOrder(true);
+});
+function setField(e) {
+  const k = e.target.dataset?.k;
+  const c = CTX?.mode === "wizard" ? CTX : CTX?.mode === "order" ? CTX.order : null;
+  if (!k || !c) return;
+  let v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+  if (CTX.mode === "order" && typeof v === "string") { const f = orderFormat(k, v); if (f !== v) { v = f; e.target.value = f; } }
+  c.ans[k] = v;
+  if (c.errs[k]) { delete c.errs[k]; e.target.closest(".fld")?.querySelector(".ferr")?.remove(); }
+  if (CTX.mode === "wizard") save(false);
+}
+document.addEventListener("submit", (e) => {
+  if (e.target.id !== "wiz") return;
+  e.preventDefault();
+  CTX.errs = validate();
+  if (Object.keys(CTX.errs).length) { renderWizard(); document.querySelector(".ferr")?.closest(".fld")?.scrollIntoView({ block: "center" }); return; }
+  CTX.step++;
+  if (STEPS[CTX.step].otp) { CTX.ans.phoneVerified = false; CTX.otp = null; }
+  renderWizard();
+});
+document.addEventListener("click", (e) => {
+  if (e.target.id === "prev") { clearInterval(resendTimer); CTX.otp = null; CTX.errs = {}; CTX.step--; renderWizard(); }
+  if (e.target.id === "edit") { CTX.mode = "wizard"; CTX.step = 0; CTX.errs = {}; renderWizard(); }
+});
+
+/* ---------- חישוב הצעות לפי הפרופיל ---------- */
+function riskFactors(a) { return InsurerApi.risk(InsurerApi.standardRequest(CTX.p, a)); }
+
+/* ---------- מאפייני הפוליסה (מוצגים בפתיחה בלחיצה מתחת לכל הצעה) ---------- */
+// מאפייני הפוליסה הנוכחית — מתוך הכיסויים שבקובץ
+function currentDetails(p) {
+  const rows = [];
+  const d = p.driverSpecifications;
+  rows.push({ label: "סוג הפוליסה", v: p.subCategory, k: "info" });
+  (p.coverages || []).forEach((c) => {
+    const parts = [];
+    if (c.sumInsuredNis != null) parts.push("סכום ביטוח " + nis(c.sumInsuredNis));
+    if (c.deductibleNis != null) parts.push("השתתפות עצמית " + nis(c.deductibleNis));
+    rows.push({ label: c.name, v: parts.join(" · ") || (c.isCovered ? "כלול" : "לא כלול"), k: c.isCovered ? "yes" : "no" });
+  });
+  if (d) {
+    const bits = [];
+    if (d.isAnyDriver) bits.push("כל נהג");
+    if (d.namedDriversCount) bits.push(`${d.namedDriversCount} נהגים מוגדרים`);
+    if (d.isYoungDriverIncluded) bits.push("כולל נהג צעיר");
+    if (d.minDriverAge != null) bits.push(`גיל מינימום ${d.minDriverAge}`);
+    if (d.minLicenceYears != null) bits.push(`ותק ${d.minLicenceYears}+ שנים`);
+    rows.push({ label: "נהגים", v: bits.join(" · "), k: "info" });
+  }
+  rows.push({ label: "תקופת הביטוח", v: `${fmtDate(p.startDate)} – ${fmtDate(p.endDate)}`, k: "info" });
+  rows.push({ label: "תשלום", v: (L.payment[p.premium.paymentMethod] || p.premium.paymentMethod) + (p.premium.installmentsCount ? ` · ${p.premium.installmentsCount} תשלומים` : ""), k: "info" });
+  return rows;
+}
+
+const detailsHtml = (rows) => `
+  <details class="odet"><summary>פרטי הפוליסה</summary>
+    <div class="det-grid">${rows.map((r) => `<div class="drow"><span class="dl">${esc(r.label)}</span><span class="dv ${r.k}">${r.k === "yes" ? "✓ " : r.k === "no" ? "✕ " : ""}${esc(r.v)}</span></div>`).join("")}</div>
+  </details>`;
+
+function apiPanelHtml(r) {
+  if (!r || !r.exchange) return "";
+  const rq = r.exchange.request, rs = r.exchange.response, pretty = (o) => esc(JSON.stringify(o, null, 2));
+  return `<details class="odet api"><summary>תגובת ה-API של ${esc(r.company)} (JSON)</summary>
+    <div class="api-meta"><span class="num">${esc(rq.method)} ${esc(rq.url)}</span><span class="badge ${rs.status === 200 ? "ok" : "crit"}">${rs.status} ${esc(rs.statusText)}</span><span class="muted num">${rs.latencyMs}ms</span></div>
+    <div class="api-cols"><div><div class="api-t">בקשה</div><pre>${pretty({ headers: rq.headers, body: rq.body })}</pre></div><div><div class="api-t">תגובה</div><pre>${pretty({ headers: rs.headers, body: rs.body })}</pre></div></div>
+  </details>`;
+}
+
+/* ---------- הצעות מחברות הביטוח: קריאה א-סינכרונית לכל חברה, והצגה ברשימה אחת אחרי השנייה ---------- */
+const REVEAL_GAP_MS = 1000; // השהיה בין הצגת חברה אחת לבאה
+
+function quoteStore() {
+  const sig = InsurerApi.requestSignature(InsurerApi.standardRequest(CTX.p, CTX.ans));
+  if (CTX.quotesSig !== sig) { CTX.quotesSig = sig; CTX.quotes = {}; } // שינוי בתשובות מבטל הצעות קודמות
+  return CTX.quotes;
+}
+const quotesOf = (kind) => quoteStore()[kind]?.value || null;
+
+function loadQuotes(kind) {
+  const store = quoteStore();
+  if (!store[kind]) {
+    const others = POOL.filter((c) => c !== CTX.p.insuranceCompany);
+    const entry = (store[kind] = { value: null, arrived: [], shown: 0, total: others.length, lastReveal: null });
+    const std = InsurerApi.standardRequest(CTX.p, { ...CTX.ans, coverage: kind });
+    // הקריאות יוצאות במקביל; כל תשובה נרשמת בסדר ההגעה שלה
+    const calls = others.map((c) => InsurerApi.requestQuote(c, std)
+      .catch((err) => ({ company: c, ok: false, exchange: null, decline: { code: "NETWORK_ERROR", message: String(err), label: "שגיאת תקשורת מול השירות" } }))
+      .then((r) => { entry.arrived.push(r); if (entry.onArrive) entry.onArrive(r); return r; }));
+    entry.promise = Promise.all(calls).then(() => {
+      const list = entry.arrived.slice();
+      entry.value = { kind, std, list, results: Object.fromEntries(list.map((r) => [r.company, r])), offers: list.filter((r) => r.ok).map((r) => r.offer).sort((x, y) => x.annual - y.annual) };
+      return entry.value;
+    });
+  }
+  return store[kind].promise;
+}
+
+function offerCardHtml(o, r, a, curAnnual, fresh) {
+  const diff = curAnnual - o.annual;
+  return `<div class="card offer${fresh ? " fresh" : ""}" data-co="${esc(o.company)}" data-annual="${o.annual}">
+    <div><div class="co">${esc(o.company)}</div><div class="specs">${esc(KIND_LABEL[a.coverage])}</div></div>
+    <div><div class="specs">${o.sum != null ? `סכום ביטוח <span class="num">${nis(o.sum)}</span>` : ""}${o.sum != null && o.deductible != null ? " · " : ""}${o.deductible != null ? `השתתפות עצמית <span class="num">${nis(o.deductible)}</span>` : ""}</div>
+      ${o.extras.length ? `<div class="chips">${o.extras.map(([e, y]) => `<span class="chip ${y ? "yes" : ""}">${y ? "✓" : "✕"} ${esc(e)}</span>`).join("")}</div>` : ""}</div>
+    <div class="price"><div class="v num">${nis(o.annual)}</div><div class="muted num" style="font-size:13px">${nis(o.monthly)} / חודש</div>
+      <div class="save ${diff > 0 ? "good" : "bad"}">${diff === 0 ? "ללא הפרש" : diff > 0 ? `חיסכון של ${nis(diff)} בשנה` : `יקר ב-${nis(-diff)} בשנה`}</div>
+      <button class="act" data-co="${esc(o.company)}" style="margin-top:8px">לקבלת הצעה</button></div>
+    ${detailsHtml(o.details)}
+    ${apiPanelHtml(r)}
+  </div>`;
+}
+
+function declinedCardHtml(r, fresh) {
+  return `<div class="card offer declined${fresh ? " fresh" : ""}">
+    <div><div class="co">${esc(r.company)}</div><div class="specs">${esc(r.decline.label)}</div></div>
+    <div class="specs num">${r.exchange ? r.exchange.response.status + " · " : ""}${esc(r.decline.code)}</div>
+    <div></div>
+    ${apiPanelHtml(r)}
+  </div>`;
+}
+
+// מוסיף לרשימה תשובה של חברה אחת: הצעה, או סירוב בקטע נפרד
+function appendResult(entry, r, fresh) {
+  const { p, ans: a } = CTX, curAnnual = p.premium.annualNis ?? p.premium.monthlyNis * 12;
+  if (r.ok) $("#offersList").insertAdjacentHTML("beforeend", offerCardHtml(r.offer, r, a, curAnnual, fresh));
+  else { $("#declinedBox").hidden = false; $("#declinedList").insertAdjacentHTML("beforeend", declinedCardHtml(r, fresh)); }
+  $("#offersCount").textContent = $("#offersList").querySelectorAll(".offer[data-co]").length;
+  $("#declinedCount").textContent = $("#declinedList").children.length;
+}
+
+function updateChart() {
+  const { p } = CTX, curAnnual = p.premium.annualNis ?? p.premium.monthlyNis * 12;
+  const shown = [...$("#offersList").querySelectorAll(".offer[data-co]")].map((n) => ({ company: n.dataset.co, annual: +n.dataset.annual }));
+  const all = [{ company: p.insuranceCompany, annual: curAnnual, cur: true }, ...shown].sort((x, y) => x.annual - y.annual);
+  const maxA = Math.max(...all.map((x) => x.annual));
+  $("#chartBox").innerHTML = all.map((x) => `
+      <div class="bar-row"><div>${esc(x.company)}${x.cur ? ` <span class="badge cur">נוכחית</span>` : ""}</div>
+        <div class="track"><div class="fill ${x.cur ? "cur" : x === all[0] ? "best" : ""}" style="width:${(x.annual / maxA) * 100}%"></div></div>
+        <div class="num">${nis(x.annual)}</div></div>`).join("");
+}
+
+function updateProgress(entry) {
+  const box = $("#rvProgress");
+  if (entry.shown >= entry.total) { box.innerHTML = `התקבלו תשובות מכל ${entry.total} החברות · הרשימה מסודרת לפי מחיר`; return; }
+  box.innerHTML = `<div class="rvp-t"><span>מקבלים הצעות מחברות הביטוח…</span><span class="num">${entry.shown} / ${entry.total}</span></div>
+    <div class="lbar" role="progressbar" aria-valuemin="0" aria-valuemax="${entry.total}" aria-valuenow="${entry.shown}"><div class="lfill" style="width:${(entry.shown / entry.total) * 100}%"></div></div>`;
+}
+
+// אחרי שכל החברות הוצגו: מיון לפי מחיר (הצמתים זזים, ולכן פרטים שנפתחו נשארים פתוחים) וסימון ההצעה הזולה
+function finalizeResults(entry) {
+  const list = $("#offersList"), cards = [...list.querySelectorAll(".offer[data-co]")].sort((x, y) => +x.dataset.annual - +y.dataset.annual);
+  cards.forEach((n) => list.appendChild(n));
+  if (cards[0] && !cards[0].classList.contains("best")) {
+    cards[0].classList.add("best");
+    cards[0].querySelector(".co").insertAdjacentHTML("beforeend", ` <span class="badge best">הזול ביותר</span>`);
+  }
+  if (!cards.length && !list.querySelector(".no-offers")) list.insertAdjacentHTML("beforeend", `<div class="card err muted no-offers">אף חברה לא החזירה הצעה עבור הפרטים שהוזנו. אפשר לעדכן את הפרטים או לשנות את סוג הביטוח.</div>`);
+  updateChart(); updateProgress(entry);
+}
+
+function startReveal(entry) {
+  clearTimeout(CTX.revealTimer);
+  const tick = () => {
+    if (CTX.mode !== "results" || CTX.revealEntry !== entry || !$("#offersList")) return; // עזבנו את העמוד
+    if (entry.shown >= entry.total) return finalizeResults(entry);
+    const ready = entry.shown < entry.arrived.length;
+    const since = entry.lastReveal == null ? Infinity : performance.now() - entry.lastReveal;
+    if (ready && since >= REVEAL_GAP_MS) {
+      const r = entry.arrived[entry.shown++];
+      entry.lastReveal = performance.now();
+      appendResult(entry, r, true); updateChart(); updateProgress(entry);
+      if (entry.shown >= entry.total) return finalizeResults(entry);
+    }
+    CTX.revealTimer = setTimeout(tick, ready ? Math.max(30, REVEAL_GAP_MS - (performance.now() - entry.lastReveal)) : 80);
+  };
+  tick();
+}
+
+/* ---------- שכבת ה-loader: לוגואים שמשקפים את סטטוס קריאות ה-API בזמן אמת ---------- */
+const LAYER_LINGER_MS = 900; // כמה זמן השכבה נשארת אחרי שהגיעה התשובה האחרונה
+
+function openApiLayer(entry) {
+  if (entry.layerShown || entry.arrived.length >= entry.total) return; // הקריאות כבר הסתיימו: אין מה להציג
+  entry.layerShown = true;
+  const { p } = CTX;
+  let dlg = document.getElementById("apiLayer");
+  if (!dlg) {
+    dlg = document.createElement("dialog"); dlg.id = "apiLayer"; dlg.className = "apilayer";
+    dlg.setAttribute("aria-label", "קריאות לשירותי חברות הביטוח");
+    dlg.innerHTML = `<div id="apiLayerRoot"></div>`;
+    document.body.appendChild(dlg);
+    dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); }); // לחיצה מחוץ למעגל סוגרת; Esc סוגר גם הוא
+  }
+  const outcome = (r) => (r.ok ? ["yes", "התקבלה הצעה"] : ["no", "לא הוצעה"]);
+  const loader = InsLoader.run(dlg.querySelector("#apiLayerRoot"), {
+    driven: true, minimal: true, companies: POOL,
+  });
+  loader.set(p.insuranceCompany, { state: "done", kind: "cur", text: "הפוליסה שלך" });
+  POOL.filter((c) => c !== p.insuranceCompany).forEach((c) => loader.set(c, { state: "load" })); // כל הבקשות בדרך
+  const apply = (r) => { const [kind, text] = outcome(r); loader.set(r.company, { state: "done", kind, text }); };
+  entry.arrived.forEach(apply);
+  entry.onArrive = apply;
+  entry.promise.then(() => setTimeout(() => { if (dlg.open) dlg.close(); }, LAYER_LINGER_MS));
+  dlg.addEventListener("close", () => { entry.onArrive = null; }, { once: true });
+  dlg.showModal();
+}
+
+/* ---------- עמוד ההצעות ---------- */
+function renderResults() {
+  const { p, ans: a } = CTX;
+  const av = p.assetDetails || {}, d = p.driverSpecifications;
+  const curAnnual = p.premium.annualNis ?? p.premium.monthlyNis * 12;
+  loadQuotes(a.coverage); // מתחיל את הקריאות אם עוד לא יצאו
+  const entry = quoteStore()[a.coverage];
+  CTX.revealEntry = entry; clearTimeout(CTX.revealTimer);
+  const { F, total } = riskFactors(a);
+  const mainCov = (p.coverages || []).find((x) => x.sumInsuredNis != null);
+  const kv = (k, v) => v == null || v === "" ? "" : `<div class="kv"><span>${k}</span><span>${v}</span></div>`;
+  const yn = (v) => (v === "yes" ? "כן" : "לא");
+  const pct = Math.round((total - 1) * 100);
+  const withDed = a.coverage !== "mandatory";
+
+  document.title = `השוואת ביטוח רכב · ${av.vehicleManufacturer || ""} ${av.vehicleModel || ""}`;
+  $("#app").innerHTML = `
+    <a class="back" href="index.html">חזרה להביטוחים שלי</a>
+    <h1>השוואת ביטוח רכב</h1>
+    <div class="demo-note">הדגמה בלבד · ההצעות מתקבלות מקריאות API מדומות לשירותי חברות הביטוח (קבצים בתיקיית api/), והמחירים אינם תעריפים אמיתיים</div>
+
+    <div class="row-h"><h2>הפרטים שעליהם מבוססת ההשוואה</h2><button class="ghost" id="edit" type="button">עריכת הפרטים</button></div>
+    <section class="card basis">
+      <div><h3>לקוח</h3>
+        ${kv("שם", esc(a.firstName + " " + a.lastName))}
+        ${kv("ת״ז", `<span class="num">${esc(a.idNumber)}</span>`)}
+        ${kv("טלפון", `<span class="num">${esc(a.phone)}</span>${a.phoneVerified ? ` <span class="badge best">מאומת</span>` : ""}`)}
+        ${kv("גיל", esc(a.mainAge))}
+        ${kv("ותק נהיגה", esc(a.licenceYears) + " שנים")}</div>
+      <div><h3>נהגים</h3>
+        ${kv("הנהג הצעיר ביותר", "גיל " + esc(a.youngestAge))}
+        ${kv("מספר נהגים", esc(a.driversCount))}
+        ${kv("מי רשאי לנהוג", a.whoDrives === "any" ? "כל נהג" : "נהגים מוגדרים")}
+        ${kv("תביעות (3 שנים)", a.hadClaims === "yes" ? esc(a.claimsCount) + (a.atFault === "yes" ? " · באשמה" : "") : "אין")}
+        ${kv("סירוב / ביטול", yn(a.cancelled))}</div>
+      <div><h3>רכב</h3>
+        ${kv("דגם", esc((av.vehicleManufacturer || "") + " " + (av.vehicleModel || "")))}
+        ${kv("לוחית", av.licensePlate ? `<span class="plate">${esc(av.licensePlate)}</span>` : "")}
+        ${kv("שנת ייצור", av.modelYear ? `<span class="num">${esc(av.modelYear)}</span>` : "")}
+        ${kv("מנוע", av.engineType ? esc(L.engine[av.engineType] || av.engineType) : "")}
+        ${kv("בעלות", av.ownershipType ? esc(L.owner[av.ownershipType] || av.ownershipType) : "")}</div>
+      <div><h3>הכיסוי המבוקש</h3>
+        ${kv("סוג", esc(KIND_LABEL[a.coverage]))}
+        ${kv("שימוש", a.usage === "private" ? "פרטי" : "פרטי + עבודה")}
+        ${kv("ק״מ שנתי", esc(MILEAGE[a.mileage]))}
+        ${withDed ? kv("חניה", esc(PARKING[a.parking])) : ""}
+        ${withDed ? kv("השתתפות עצמית", esc(DEDUCT[a.deductible])) : ""}
+        ${kv("תחילת ביטוח", `<span class="num">${fmtDate(a.startDate)}</span>`)}</div>
+      <div><h3>הפוליסה הנוכחית</h3>
+        ${kv("סוג", esc(p.subCategory))}
+        ${kv("חברה", esc(p.insuranceCompany))}
+        ${kv("תוקף עד", `<span class="num">${fmtDate(p.endDate)}</span>`)}
+        ${kv("פרמיה שנתית", `<span class="num">${nis(curAnnual)}</span>`)}
+        ${kv("תשלום", esc(L.payment[p.premium.paymentMethod] || p.premium.paymentMethod))}</div>
+    </section>
+
+    <h2>מה משפיע על המחיר</h2>
+    <section class="card chart">
+      <div class="muted" style="margin-bottom:10px">התאמת המחיר לפרופיל שהזנת: <b class="${pct > 0 ? "bad" : "good"}">${pct > 0 ? "+" : ""}${pct}%</b> ביחס למחיר הבסיס</div>
+      <div class="chips">${F.map((x) => `<span class="chip ${x.delta > 0 ? "up" : "down"}">${x.delta > 0 ? "▲" : "▼"} ${esc(x.label)} (${x.delta > 0 ? "+" : ""}${Math.round(x.delta * 100)}%)</span>`).join("")}</div>
+    </section>
+
+    <h2>השוואת פרמיה שנתית</h2>
+    <section class="card chart" id="chartBox"></section>
+
+    <div class="row-h"><h2>הצעות מחברות אחרות (<span id="offersCount">0</span>)</h2><button class="ghost" id="changeType" type="button">לשינוי סוג ביטוח</button></div>
+    <div class="muted" style="margin:-4px 0 12px">מוצגות הצעות עבור: <b>${esc(KIND_LABEL[a.coverage])}</b></div>
+    <div class="rv-progress" id="rvProgress" role="status" aria-live="polite"></div>
+    <div class="offers" id="offersList">
+      <div class="card offer current">
+        <div><div class="co">${esc(p.insuranceCompany)} <span class="badge cur">הפוליסה הנוכחית</span></div><div class="specs">${esc(p.subCategory)}</div></div>
+        <div class="specs">${mainCov ? `סכום ביטוח <span class="num">${nis(mainCov.sumInsuredNis)}</span>` : ""}</div>
+        <div class="price"><div class="v num">${nis(curAnnual)}</div><div class="muted num" style="font-size:13px">${nis(p.premium.monthlyNis)} / חודש</div></div>
+        ${detailsHtml(currentDetails(p))}
+      </div>
+    </div>
+    <div id="declinedBox" hidden><h2>חברות שלא הציעו (<span id="declinedCount">0</span>)</h2><div class="offers" id="declinedList"></div></div>
+    <footer>ההשוואה מחושבת עבור פוליסה <span class="num">${esc(p.policyId)}</span> · ההצעות התקבלו מקריאות API מדומות לפי הפרטים שהוזנו בתהליך</footer>`;
+  window.scrollTo(0, 0);
+  // תשובות שכבר הוצגו (למשל בחזרה מטופס ההזמנה) חוזרות מיד; היתר מוצגות בהדרגה
+  for (let i = 0; i < entry.shown; i++) appendResult(entry, entry.arrived[i], false);
+  updateChart(); updateProgress(entry);
+  if (entry.shown >= entry.total) finalizeResults(entry); else startReveal(entry);
+  openApiLayer(entry); // שכבה עם ה-loader והלוגואים בזמן שהתשובות מגיעות
+}
+
+/* ---------- הזמנה: פרטים חסרים ותפיסת מסגרת (הדגמה) ---------- */
+const MARITAL = [["single", "רווק/ה"], ["married", "נשוי/אה"], ["divorced", "גרוש/ה"], ["widowed", "אלמן/ה"]];
+const INSTALL = [["1", "תשלום אחד"], ["3", "3 תשלומים"], ["6", "6 תשלומים"], ["10", "10 תשלומים"], ["12", "12 תשלומים"]];
+const DEMO_CARD = { number: "4111 1111 1111 1111", exp: "12/30", cvv: "123" }; // מספר בדיקה תקני, לא כרטיס אמיתי
+
+function luhn(num) {
+  let sum = 0, alt = false;
+  for (let i = num.length - 1; i >= 0; i--) { let d = +num[i]; if (alt) { d *= 2; if (d > 9) d -= 9; } sum += d; alt = !alt; }
+  return sum % 10 === 0;
+}
+
+function orderSteps() {
+  const w = CTX.ans;
+  const extra = w.whoDrives === "named" ? Math.max(0, (+w.driversCount || 1) - 1) : 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const drivers = [];
+  for (let i = 1; i <= extra; i++) drivers.push(
+    { type: "heading", k: "h" + i, label: `נהג נוסף ${i}` },
+    { k: `d${i}Name`, label: "שם מלא", type: "text" },
+    { k: `d${i}Age`, label: "גיל", type: "number", min: 16, max: 99 },
+    { k: `d${i}Lic`, label: "ותק נהיגה (שנים)", type: "number", min: 0, max: 80 });
+  return [
+    { title: "פרטים חסרים", fields: [
+      { k: "street", label: "רחוב", type: "text" },
+      { k: "houseNo", label: "מספר בית", type: "text", re: /^\d{1,4}[א-ת]?$/, msg: "מספר בית לא תקין" },
+      { k: "city", label: "עיר / יישוב", type: "text" },
+      { k: "zip", label: "מיקוד", type: "text", inputmode: "numeric", maxlength: 7, re: /^\d{5,7}$/, msg: "מיקוד בן 5–7 ספרות" },
+      { k: "birthDate", label: "תאריך לידה", type: "date", check: (v) => (v > today || v < "1920-01-01" ? "תאריך לא תקין" : "") },
+      { k: "marital", label: "מצב משפחתי", type: "select", opts: MARITAL },
+      { k: "occupation", label: "עיסוק", type: "text" },
+      { k: "licenceNo", label: "מספר רישיון נהיגה", type: "text", inputmode: "numeric", maxlength: 8, re: /^\d{6,8}$/, msg: "6–8 ספרות" },
+      { k: "owner", label: "בעלות על הרכב", type: "radio", opts: [["me", "בבעלותי"], ["company", "חברה / ליסינג"], ["other", "אחר"]] },
+      { k: "lien", label: "האם קיים שעבוד על הרכב?", type: "radio", opts: YN },
+      { k: "lienHolder", label: "שם הגוף המשעבד", type: "text", showIf: (a) => a.lien === "yes" },
+      { k: "prevInsurer", label: "חברת הביטוח הנוכחית", type: "text" },
+      { k: "prevPolicy", label: "מספר הפוליסה הנוכחית", type: "text" },
+    ] },
+    ...(extra ? [{ title: "נהגים נוספים", fields: drivers }] : []),
+    { title: "תשלום", payment: true, fields: [
+      { k: "payMode", label: "אמצעי תשלום", type: "radio", opts: [["card", "תפיסת מסגרת בכרטיס אשראי"], ["later", "ללא פרטי כרטיס עכשיו (נציג ייצור קשר)"]] },
+      { k: "cardName", label: "שם בעל הכרטיס", type: "text", showIf: (a) => a.payMode === "card" },
+      { k: "cardId", label: "ת״ז בעל הכרטיס", type: "text", inputmode: "numeric", maxlength: 9, re: /^\d{9}$/, msg: "ת״ז בת 9 ספרות", showIf: (a) => a.payMode === "card" },
+      { k: "cardNumber", label: "מספר כרטיס", type: "text", inputmode: "numeric", maxlength: 23, showIf: (a) => a.payMode === "card",
+        check: (v) => { const d = v.replace(/\D/g, ""); return d.length < 13 || d.length > 19 || !luhn(d) ? "מספר כרטיס לא תקין" : ""; } },
+      { k: "cardExp", label: "תוקף (MM/YY)", type: "text", inputmode: "numeric", maxlength: 5, showIf: (a) => a.payMode === "card",
+        check: (v) => {
+          const m = /^(0[1-9]|1[0-2])\/(\d{2})$/.exec(v); if (!m) return "תוקף לא תקין";
+          return new Date(2000 + +m[2], +m[1], 1) <= new Date() ? "הכרטיס פג תוקף" : "";
+        } },
+      { k: "cardCvv", label: "קוד אבטחה (CVV)", type: "password", inputmode: "numeric", maxlength: 4, re: /^\d{3,4}$/, msg: "3–4 ספרות", showIf: (a) => a.payMode === "card" },
+      { k: "installments", label: "מספר תשלומים", type: "select", opts: INSTALL, showIf: (a) => a.payMode === "card" },
+    ] },
+    { title: "סיכום ואישור", summary: true },
+  ];
+}
+
+function orderDefaults(p) {
+  const c = CTX.data.customer, w = CTX.ans;
+  // נתוני דמה: כתובת, עיסוק, רישיון, נהגים נוספים וכרטיס בדיקה
+  const d = {
+    street: "הרצל", houseNo: "12", city: "תל אביב-יפו", zip: "6120101", birthDate: c.birthDate || "1982-11-04", marital: "married", occupation: "מהנדס תוכנה",
+    licenceNo: "12345678", owner: "me", lien: "no", lienHolder: "", prevInsurer: p.insuranceCompany, prevPolicy: p.policyId,
+    payMode: "card", cardName: `${w.firstName} ${w.lastName}`, cardId: w.idNumber, cardNumber: DEMO_CARD.number, cardExp: DEMO_CARD.exp, cardCvv: DEMO_CARD.cvv, installments: "1",
+    consent: false,
+  };
+  const first = ["דנה", "יונתן", "מאיה", "עומר", "נועה"], ages = [19, 24, 27, 31, 45], lic = [1, 5, 8, 12, 20];
+  for (let i = 1; i <= 5; i++) Object.assign(d, { [`d${i}Name`]: `${first[i - 1]} ${w.lastName}`, [`d${i}Age`]: String(ages[i - 1]), [`d${i}Lic`]: String(lic[i - 1]) });
+  return d;
+}
+
+function startOrder(company) {
+  const offer = quoteStore()[CTX.ans.coverage]?.arrived.find((r) => r.ok && r.company === company)?.offer;
+  if (!offer) return;
+  CTX.order = { offer, ans: orderDefaults(CTX.p), step: 0, errs: {}, steps: null, done: false };
+  CTX.order.steps = orderSteps();
+  CTX.mode = "order";
+  renderOrder();
+}
+
+function orderValidate() {
+  const O = CTX.order, st = O.steps[O.step], a = O.ans, errs = {};
+  if (st.summary) { if (!a.consent) errs.consent = "יש לאשר כדי להמשיך"; return errs; }
+  for (const f of visible(st, a)) {
+    if (["radio", "checkbox", "select", "heading"].includes(f.type)) continue;
+    const v = String(a[f.k] ?? "").trim();
+    if (!v) { errs[f.k] = "שדה חובה"; continue; }
+    if (f.type === "number") { const n = Number(v); if (!Number.isFinite(n) || n < f.min || n > f.max) errs[f.k] = `הזינו מספר בין ${f.min} ל-${f.max}`; }
+    else if (f.re && !f.re.test(v)) errs[f.k] = f.msg;
+    else if (f.check) { const m = f.check(v, a); if (m) errs[f.k] = m; }
+  }
+  return errs;
+}
+
+function orderFormat(k, v) {
+  const d = v.replace(/\D/g, "");
+  if (k === "cardNumber") return d.slice(0, 19).replace(/(.{4})/g, "$1 ").trim();
+  if (k === "cardExp") return d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2, 4) : d.slice(0, 2);
+  if (["cardCvv", "cardId", "zip", "licenceNo"].includes(k)) return d;
+  return v;
+}
+
+const last4 = (n) => n.replace(/\D/g, "").slice(-4);
+
+function orderSummaryHtml() {
+  const { ans: a, offer: o } = CTX.order, w = CTX.ans;
+  const row = (k, v) => `<div class="kv"><span>${k}</span><span>${v}</span></div>`;
+  const card = a.payMode === "card";
+  return `<div class="sum-grid">
+    <div><h3>ההצעה</h3>${row("חברה", esc(o.company))}${row("סוג", esc(KIND_LABEL[w.coverage]))}${row("פרמיה שנתית", `<span class="num">${nis(o.annual)}</span>`)}${o.deductible != null ? row("השתתפות עצמית", `<span class="num">${nis(o.deductible)}</span>`) : ""}${row("תחילת ביטוח", `<span class="num">${fmtDate(w.startDate)}</span>`)}</div>
+    <div><h3>מבוטח</h3>${row("שם", esc(w.firstName + " " + w.lastName))}${row("ת״ז", `<span class="num">${esc(w.idNumber)}</span>`)}${row("כתובת", esc(`${a.street} ${a.houseNo}, ${a.city}`))}${row("מיקוד", `<span class="num">${esc(a.zip)}</span>`)}${row("רישיון נהיגה", `<span class="num">${esc(a.licenceNo)}</span>`)}</div>
+    <div><h3>תשלום</h3>${card ? row("אמצעי", "תפיסת מסגרת באשראי") + row("כרטיס", `<span class="num">•••• ${esc(last4(a.cardNumber))}</span>`) + row("מסגרת לתפיסה", `<span class="num">${nis(o.annual)}</span>`) + row("תשלומים", esc(a.installments)) : row("אמצעי", "נציג ייצור קשר")}</div>
+  </div>
+  ${card ? `<p class="pay-note">תפיסת המסגרת אינה חיוב: הסכום נשמר בכרטיס עד חתימה על הפוליסה, ואם לא נחתמה פוליסה תוך 7 ימים המסגרת משתחררת אוטומטית.</p>` : ""}
+  <label class="fld check consent"><input type="checkbox" data-k="consent" ${a.consent ? "checked" : ""}><span>קראתי את תנאי הפוליסה והצהרת הבריאות, ואני מאשר/ת את שליחת הבקשה (הדגמה בלבד)</span></label>
+  ${CTX.order.errs.consent ? `<div class="ferr">${esc(CTX.order.errs.consent)}</div>` : ""}`;
+}
+
+function renderOrder(keepScroll) {
+  const O = CTX.order, st = O.steps[O.step], o = O.offer, a = O.ans, last = O.step === O.steps.length - 1;
+  const av = CTX.p.assetDetails || {};
+  let body;
+  if (st.summary) body = orderSummaryHtml();
+  else if (st.payment) body = `<div class="fields">
+      <p class="pay-note">אפשר להשאיר פרטי כרטיס אשראי לתפיסת מסגרת. הסכום נשמר בכרטיס בלי חיוב עד החתימה על הפוליסה. <b>זו הדגמה: אל תזינו פרטי כרטיס אמיתיים.</b></p>
+      ${visible(st, a).map((f) => fieldHtml(f, a, O.errs)).join("")}
+      ${a.payMode === "card" ? `<div class="fld" style="grid-column:1/-1"><button type="button" class="ghost" id="fillCard">מילוי כרטיס לדוגמה</button></div>` : ""}
+    </div>`;
+  else body = `<div class="fields">${visible(st, a).map((f) => fieldHtml(f, a, O.errs)).join("")}</div>`;
+  document.title = `בקשת הצעה · ${o.company}`;
+  $("#app").innerHTML = `
+    <button type="button" class="link back-btn" id="oBack">חזרה להצעות</button>
+    <h1>בקשת הצעה מ${esc(o.company)}</h1>
+    <div class="demo-note">הדגמה בלבד · לא נשלח דבר לחברת הביטוח ולא מתבצעת תפיסת מסגרת אמיתית</div>
+    <section class="card ohead">
+      <div><div class="muted">חברה</div><b>${esc(o.company)}</b></div>
+      <div><div class="muted">סוג</div>${esc(KIND_LABEL[CTX.ans.coverage])}</div>
+      <div><div class="muted">רכב</div>${esc((av.vehicleManufacturer || "") + " " + (av.vehicleModel || ""))}</div>
+      <div><div class="muted">פרמיה שנתית</div><b class="num">${nis(o.annual)}</b> <span class="muted num">(${nis(o.monthly)} / חודש)</span></div>
+    </section>
+    <ol class="stepper">${O.steps.map((s, i) => `<li class="${i === O.step ? "cur" : i < O.step ? "done" : ""}"><span class="n">${i < O.step ? "✓" : i + 1}</span><span class="t">${esc(s.title)}</span></li>`).join("")}</ol>
+    <form class="card wiz" id="owiz" novalidate>
+      <h2 style="margin-top:0">שלב ${O.step + 1} מתוך ${O.steps.length} · ${esc(st.title)}</h2>
+      ${body}
+      <div class="nav">
+        <button type="button" class="ghost" id="oprev">${O.step === 0 ? "ביטול" : "הקודם"}</button>
+        <button type="submit" class="act">${last ? "אישור ושליחת הבקשה" : "המשך"}</button>
+      </div>
+    </form>`;
+  if (!keepScroll) window.scrollTo(0, 0);
+}
+
+async function processOrder() {
+  const O = CTX.order, o = O.offer, a = O.ans, card = a.payMode === "card";
+  const steps = ["מאמת את הפרטים שהוזנו", ...(card ? [`תופס מסגרת אשראי בסך ${nis(o.annual)}`] : []), `מעביר את הבקשה ל${o.company}`, "מקבל אישור"];
+  $("#app").innerHTML = `<div class="card proc"><h1>שולחים את הבקשה</h1>
+    <ul class="osteps">${steps.map((t, i) => `<li id="os${i}"><span class="dot"></span>${esc(t)}</li>`).join("")}</ul></div>`;
+  window.scrollTo(0, 0);
+  for (let i = 0; i < steps.length; i++) {
+    $("#os" + i).className = "active"; await wait(750); $("#os" + i).className = "done";
+  }
+  await wait(300);
+  O.ref = "REQ-" + String(crypto.getRandomValues(new Uint32Array(1))[0] % 10000000).padStart(7, "0");
+  O.last4 = card ? last4(a.cardNumber) : "";
+  // פרטי הכרטיס אינם נשמרים: נמחקים מיד עם השלמת התהליך
+  a.cardNumber = a.cardCvv = a.cardExp = "";
+  O.done = true;
+  renderConfirm();
+}
+
+function renderConfirm() {
+  const O = CTX.order, o = O.offer, a = O.ans, card = a.payMode === "card";
+  const row = (k, v) => `<div class="kv"><span>${k}</span><span>${v}</span></div>`;
+  document.title = "הבקשה נשלחה";
+  $("#app").innerHTML = `
+    <h1>הבקשה נשלחה</h1>
+    <div class="demo-note">הדגמה בלבד · לא נשלחה בקשה אמיתית ולא נתפסה מסגרת</div>
+    <section class="card confirm">
+      <div class="sum-grid">
+        <div>${row("מספר בקשה", `<b class="num">${esc(O.ref)}</b>`)}${row("חברה", esc(o.company))}${row("סוג", esc(KIND_LABEL[CTX.ans.coverage]))}${row("פרמיה שנתית", `<span class="num">${nis(o.annual)}</span>`)}</div>
+        <div>${card ? row("מסגרת שנתפסה", `<span class="num">${nis(o.annual)}</span>`) + row("כרטיס", `<span class="num">•••• ${esc(O.last4)}</span>`) + row("תשלומים", esc(a.installments)) : row("תשלום", "נציג ייצור קשר")}${row("תחילת ביטוח", `<span class="num">${fmtDate(CTX.ans.startDate)}</span>`)}</div>
+      </div>
+      <h3 style="margin:18px 0 6px;font-size:14px">מה קורה עכשיו</h3>
+      <ol class="next"><li>נציג של ${esc(o.company)} ייצור איתך קשר עד יום עסקים לאימות הפרטים.</li><li>תישלח אליך פוליסה לחתימה דיגיטלית${card ? ", והחיוב יבוצע רק אחרי החתימה" : ""}.</li><li>הביטוח יכנס לתוקף ב-${fmtDate(CTX.ans.startDate)}, בכפוף לחתימה.</li></ol>
+    </section>
+    <div class="nav" style="margin-top:18px"><button type="button" class="ghost" id="oDone">חזרה להצעות</button><a class="back" href="index.html">חזרה להביטוחים שלי</a></div>`;
+  window.scrollTo(0, 0);
+}
+
+document.addEventListener("submit", (e) => {
+  if (e.target.id !== "owiz") return;
+  e.preventDefault();
+  const O = CTX.order;
+  O.errs = orderValidate();
+  if (Object.keys(O.errs).length) { renderOrder(true); document.querySelector(".ferr")?.closest(".fld, fieldset")?.scrollIntoView({ block: "center" }); return; }
+  if (O.step < O.steps.length - 1) { O.step++; renderOrder(); } else processOrder();
+});
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("button.act[data-co]");
+  if (b) return startOrder(b.dataset.co);
+  if (CTX?.mode !== "order") return;
+  const O = CTX.order;
+  if (e.target.id === "oBack" || e.target.id === "oDone") { CTX.mode = "results"; CTX.order = null; renderResults(); }
+  else if (e.target.id === "oprev") { if (O.step === 0) { CTX.mode = "results"; CTX.order = null; renderResults(); } else { O.errs = {}; O.step--; renderOrder(); } }
+  else if (e.target.id === "fillCard") {
+    Object.assign(O.ans, { cardNumber: DEMO_CARD.number, cardExp: DEMO_CARD.exp, cardCvv: DEMO_CARD.cvv }); O.errs = {}; renderOrder(true);
+  }
+});
+
+/* ---------- שינוי סוג ביטוח: חלון בחירה ← loader ← הצעות חדשות ---------- */
+const TYPE_OPTS = [
+  ["third", "חובה + צד ג׳", "נזקי גוף (חובה) ונזק לרכוש של צד שלישי. אינו מכסה נזק לרכב שלך."],
+  ["comprehensive", "חובה + מקיף", "כולל גם נזק עצמי לרכב, גניבה ושריפה."],
+];
+
+function openTypeDialog() {
+  const { p, ans } = CTX;
+  let dlg = document.getElementById("typeDlg");
+  if (!dlg) { dlg = document.createElement("dialog"); dlg.id = "typeDlg"; dlg.className = "tdlg"; document.body.appendChild(dlg); }
+  dlg.setAttribute("aria-labelledby", "typeDlgTitle");
+  dlg.innerHTML = `
+    <div class="tdlg-h"><h2 id="typeDlgTitle">בחירת סוג ביטוח</h2><button type="button" class="link" id="typeClose" aria-label="סגירה">✕</button></div>
+    <p class="muted" style="margin:4px 0 6px">בחרו את סוג הכיסוי, ונחפש הצעות חדשות מכל החברות.</p>
+    ${TYPE_OPTS.map(([k, title, desc]) => `
+      <button type="button" class="tcard ${ans.coverage === k ? "sel" : ""}" data-k="${k}">
+        <span class="tt">${esc(title)}${ans.coverage === k ? ` <span class="badge cur">נבחר כעת</span>` : ""}</span>
+        <span class="td">${esc(desc)}</span>
+        <span class="tp" data-tp="${k}">מקבלים הצעות…</span>
+      </button>`).join("")}`;
+  dlg.showModal();
+  // המחיר "החל מ" נלקח מקריאות ה-API של החברות עבור כל סוג כיסוי
+  TYPE_OPTS.forEach(([k]) => loadQuotes(k).then((v) => {
+    const el = dlg.querySelector(`[data-tp="${k}"]`);
+    if (el) el.innerHTML = v.offers.length ? `החל מ-<span class="num">${nis(v.offers[0].annual)}</span> לשנה` : "אין הצעות זמינות";
+  }));
+}
+
+document.addEventListener("click", (e) => {
+  if (e.target.id === "changeType") return openTypeDialog();
+  const dlg = document.getElementById("typeDlg");
+  if (!dlg || !dlg.open) return;
+  if (e.target === dlg || e.target.id === "typeClose") return dlg.close(); // לחיצה על הרקע או על ✕
+  const card = e.target.closest(".tcard");
+  if (!card) return;
+  dlg.close();
+  const k = card.dataset.k;
+  if (k === CTX.ans.coverage) return;
+  CTX.ans.coverage = k;
+  CTX.mode = "results"; save(true); renderResults();
+});
+
+/* ---------- אתחול ---------- */
+(async function () {
+  const q = new URLSearchParams(location.search);
+  const file = q.get("file"), pid = q.get("policy");
+  const fail = (m) => { $("#app").innerHTML = `<div class="card err"><h2 style="margin-top:0">${esc(m)}</h2><p><a class="back" href="index.html">חזרה להביטוחים שלי</a></p></div>`; };
+  if (!FILES.includes(file) || !pid) return fail("לא נבחרה פוליסה להשוואה");
+  try {
+    let data;
+    if (file === "upload") data = JSON.parse(sessionStorage.getItem("harUpload")); // קובץ אקסל שהועלה בדף הבית
+    else { const r = await fetch(file); if (!r.ok) throw new Error(r.status); data = await r.json(); }
+    if (!data) throw new Error("no data");
+    const p = data.policies.find((x) => x.policyId === pid && x.category === "MOTOR");
+    if (!p) return fail("הפוליסה לא נמצאה בקובץ");
+    let session = null, saved = null;
+    try { session = JSON.parse(sessionStorage.getItem("harSession")); } catch (e) {}
+    CTX = { file, data, p, ans: defaults(data, p, session), step: 0, errs: {}, mode: "wizard" };
+    try { saved = JSON.parse(sessionStorage.getItem(storeKey())); } catch (e) {}
+    if (saved?.ans) Object.assign(CTX.ans, saved.ans);
+    if (saved?.done) { CTX.mode = "results"; renderResults(); } else renderWizard();
+  } catch (e) { fail("לא ניתן לטעון את הנתונים (הריצו דרך שרת מקומי)"); }
+})();
+</script>
+<script src="privacy.js"></script>
+</body>
+</html>

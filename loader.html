@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>תצוגת Loader</title>
+<link rel="stylesheet" href="loader.css">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f5f4f0; --card: #ffffff; --ink: #1f2328; --muted: #666a70; --line: #dddad2;
+    --accent: #0f5a63; --accent-soft: #e8f0f0;
+    --ok: #1f6a44; --ok-soft: #e7f0ea;
+    --warn: #8a5300; --warn-soft: #f5edd9;
+    --crit: #a3312a; --crit-soft: #f4e5e2;
+    --info: #0f5a63; --info-soft: #e8f0f0;
+    --s1: #0f5a63; --s2: #b8651b; --s3: #56668a; --s4: #8b7d2f; --s5: #94486a;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: var(--ink); font-family: "Segoe UI", "Heebo", Arial, sans-serif; font-size: 15px; line-height: 1.5;
+    background: var(--bg); }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 20px 16px 48px; }
+  a.back { color: var(--accent); text-decoration: none; font-size: 14px; }
+  h1.page { font-size: 24px; margin: 10px 0 4px; }
+  .muted { color: var(--muted); }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 16px 20px; margin: 18px 0 4px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 28px; align-items: end; }
+  .ctl label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .ctl .val { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .ctl input[type=range] { width: 100%; accent-color: var(--accent); }
+  .ctl.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  button { font: inherit; padding: 9px 18px; border-radius: 4px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  button.ghost { background: var(--card); color: var(--ink); border-color: var(--line); box-shadow: none; }
+  button:hover { filter: brightness(1.05); }
+  .chk { display: inline-flex; gap: 8px; align-items: center; font-size: 14px; color: var(--ink); }
+</style>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="header.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<script src="brand.js"></script>
+<div class="wrap">
+  <a class="back" href="index.html">חזרה להביטוחים שלי</a>
+  <h1 class="page">תצוגת Loader</h1>
+  <div class="muted">תצוגה מקדימה של מסך הטעינה שמופיע לפני קבלת ההצעות. האייקונים מקיפים את המעגל בהתאם להתקדמות הטעינה.</div>
+
+  <section class="panel">
+    <div class="ctl"><label>משך הטעינה: <span class="val" id="durVal">5.0</span> שניות</label><input id="dur" type="range" min="2" max="15" step="0.5" value="5"></div>
+    <div class="ctl"><label>תצוגה ידנית של ההתקדמות: <span class="val" id="seekVal">—</span></label><input id="seek" type="range" min="0" max="100" step="1" value="0"></div>
+    <div class="ctl row"><button id="replay" type="button">הפעלה מחדש</button><button id="pause" class="ghost" type="button">עצירה</button><label class="chk"><input id="loop" type="checkbox"> חזרה בלולאה</label></div>
+  </section>
+
+  <div id="root"></div>
+</div>
+
+<script src="loader.js"></script>
+<script>
+  const $ = (s) => document.querySelector(s);
+  let inst = null;
+
+  // תוצאות לדוגמה: הפניקס היא הפוליסה הנוכחית, ליד 6 מהחברות האחרות התקבלה הצעה
+  const outcomes = { "הפניקס": ["cur", "הפוליסה שלך"], "הראל": ["yes", "התקבלה הצעה"], "מגדל": ["yes", "התקבלה הצעה"], "כלל ביטוח": ["no", "לא הוצעה"],
+    "מנורה מבטחים": ["yes", "התקבלה הצעה"], "ביטוח ישיר": ["yes", "התקבלה הצעה"], "שירביט": ["no", "לא הוצעה"], "הכשרה": ["yes", "התקבלה הצעה"],
+    "AIG": ["no", "לא הוצעה"], "איילון": ["yes", "התקבלה הצעה"] };
+
+  function start(autoplay = true) {
+    if (inst) inst.stop();
+    $("#seek").value = 0; $("#seekVal").textContent = "—";
+    inst = InsLoader.run($("#root"), {
+      duration: +$("#dur").value * 1000, seed: "preview", autoplay, doneDelay: 1200,
+      subtitle: "בודקים את עשר חברות הביטוח הגדולות עבור מאזדה CX-5 EXECUTIVE 2.0",
+      outcome: (c) => outcomes[c] || ["no", "לא הוצעה"],
+      onDone: () => { if ($("#loop").checked) start(); },
+    });
+  }
+  $("#dur").oninput = (e) => { $("#durVal").textContent = (+e.target.value).toFixed(1); };
+  $("#dur").onchange = () => start();
+  $("#replay").onclick = () => start();
+  $("#pause").onclick = () => inst.stop();
+  $("#seek").oninput = (e) => { $("#seekVal").textContent = e.target.value + "%"; inst.seek(+e.target.value / 100); };
+  start();
+</script>
+<script src="privacy.js"></script>
+</body>
+</html>

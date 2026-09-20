@@ -1,0 +1,140 @@
+{
+  "company": "כלל ביטוח",
+  "note": "דוגמה שנוצרה מקוד ההדגמה: בקשה ותגובה להצעה, ותגובת סירוב.",
+  "quote": {
+    "request": {
+      "method": "POST",
+      "url": "https://ws.clal-ins.example/rest/auto/PriceOffer",
+      "headers": {
+        "Accept": "application/json",
+        "X-Clal-Token": "demo-clal-c03d77",
+        "Accept-Language": "he-IL",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-95f1f92a"
+      },
+      "body": {
+        "REQUEST_ID": "RQ-95f1f92a",
+        "START_DATE": "01.10.2026",
+        "CUST_TZ": "012345678",
+        "CUSTOMER_FIRST_NAME": "אלכס",
+        "CUSTOMER_LAST_NAME": "כהן",
+        "CUSTOMER_PHONE": "0548765432",
+        "CUSTOMER_AGE": 43,
+        "CAR_LICENSE_NO": "33445566",
+        "VEHICLE_MANUFACTURER": "מאזדה",
+        "VEHICLE_MODEL": "CX-5 EXECUTIVE 2.0",
+        "VEHICLE_YEAR": 2021,
+        "VEHICLE_ENGINE": "GASOLINE",
+        "DRIVER_LICENCE_YEARS": 26,
+        "DRIVER_YOUNGEST_AGE": 30,
+        "DRIVER_COUNT": 2,
+        "DRIVER_WHO_DRIVES": "named",
+        "DRIVER_CLAIMS_COUNT": 0,
+        "DRIVER_AT_FAULT": 0,
+        "DRIVER_PRIOR_CANCELLATION": 0,
+        "DRIVER_CONVICTIONS": 0,
+        "USAGE_TYPE": "private",
+        "USAGE_MILEAGE": "10-20",
+        "USAGE_PARKING": "private",
+        "USAGE_SECURITY": 0,
+        "COVERAGE_KIND": "COMPREHENSIVE",
+        "COVERAGE_DEDUCTIBLE_PREF": "std",
+        "PRIOR_INSURER": "הפניקס",
+        "PRIOR_POLICY_NUMBER": "MOT-2025-8812",
+        "PRIOR_ANNUAL_PREMIUM_NIS": 4320,
+        "PRIOR_KIND": "COMPREHENSIVE",
+        "PRIOR_DEDUCTIBLE_NIS": 1450,
+        "PRIOR_SUM_INSURED_NIS": 118000,
+        "SOURCE_SYSTEM": "PARTNER"
+      }
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "369"
+      },
+      "body": {
+        "QUOTE_ID": "CLAL-143A725E",
+        "KIND": "COMPREHENSIVE",
+        "TOTAL_PREMIUM_YEAR": 3690,
+        "PREMIUM_MONTH": 308,
+        "INSTALLMENTS": 6,
+        "DEDUCTIBLE": 1350,
+        "SUM_INSURED": 118000,
+        "THIRD_PARTY_LIMIT": 2000000,
+        "ROAD_ASSIST": 0,
+        "REPLACEMENT_DAYS": 14,
+        "GLASS_INCLUDED": 0,
+        "GLASS_DEDUCTIBLE": null,
+        "BATTERY_LIMIT": null,
+        "CHARGER_LIMIT": null,
+        "YOUNG_DRIVER": "none",
+        "VALID_UNTIL": "04.10.2026",
+        "RESULT_CODE": 0
+      }
+    }
+  },
+  "declined": {
+    "request": {
+      "method": "POST",
+      "url": "https://ws.clal-ins.example/rest/auto/PriceOffer",
+      "headers": {
+        "Accept": "application/json",
+        "X-Clal-Token": "demo-clal-c03d77",
+        "Accept-Language": "he-IL",
+        "Content-Type": "application/json",
+        "X-Request-Id": "RQ-964bceea"
+      },
+      "body": {
+        "REQUEST_ID": "RQ-964bceea",
+        "START_DATE": "01.10.2026",
+        "CUST_TZ": "012345678",
+        "CUSTOMER_FIRST_NAME": "אלכס",
+        "CUSTOMER_LAST_NAME": "כהן",
+        "CUSTOMER_PHONE": "0548765432",
+        "CUSTOMER_AGE": 43,
+        "CAR_LICENSE_NO": "33445566",
+        "VEHICLE_MANUFACTURER": "מאזדה",
+        "VEHICLE_MODEL": "CX-5 EXECUTIVE 2.0",
+        "VEHICLE_YEAR": 2021,
+        "VEHICLE_ENGINE": "GASOLINE",
+        "DRIVER_LICENCE_YEARS": 1,
+        "DRIVER_YOUNGEST_AGE": 17,
+        "DRIVER_COUNT": 2,
+        "DRIVER_WHO_DRIVES": "named",
+        "DRIVER_CLAIMS_COUNT": 3,
+        "DRIVER_AT_FAULT": 1,
+        "DRIVER_PRIOR_CANCELLATION": 1,
+        "DRIVER_CONVICTIONS": 1,
+        "USAGE_TYPE": "business",
+        "USAGE_MILEAGE": "gt30",
+        "USAGE_PARKING": "private",
+        "USAGE_SECURITY": 0,
+        "COVERAGE_KIND": "THIRD",
+        "COVERAGE_DEDUCTIBLE_PREF": "std",
+        "PRIOR_INSURER": "הפניקס",
+        "PRIOR_POLICY_NUMBER": "MOT-2025-8812",
+        "PRIOR_ANNUAL_PREMIUM_NIS": 4320,
+        "PRIOR_KIND": "COMPREHENSIVE",
+        "PRIOR_DEDUCTIBLE_NIS": 1450,
+        "PRIOR_SUM_INSURED_NIS": 118000,
+        "SOURCE_SYSTEM": "PARTNER"
+      }
+    },
+    "response": {
+      "status": 422,
+      "statusText": "Unprocessable Entity",
+      "headers": {
+        "Content-Type": "application/json",
+        "Content-Length": "104"
+      },
+      "body": {
+        "RESULT_CODE": 41,
+        "ERROR_CODE": "LOW_LICENCE_SENIORITY",
+        "ERROR_TEXT": "licence seniority under two years"
+      }
+    }
+  }
+}
