@@ -11,7 +11,7 @@ function connectionString() {
 }
 
 function getPool() {
-  if (!pool) pool = new Pool({ connectionString: connectionString(), max: 5, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 });
+  if (!pool) pool = new Pool({ connectionString: connectionString(), max: process.env.VERCEL ? 1 : 5, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 });
   return pool;
 }
 

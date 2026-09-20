@@ -220,17 +220,17 @@
 
 <script src="loader.js"></script>
 <script src="insurers.js"></script>
-<script src="api/insurer-api.js"></script>
-<script src="api/insurers/phoenix.js"></script>
-<script src="api/insurers/harel.js"></script>
-<script src="api/insurers/migdal.js"></script>
-<script src="api/insurers/clal.js"></script>
-<script src="api/insurers/menora.js"></script>
-<script src="api/insurers/yashir.js"></script>
-<script src="api/insurers/shirbit.js"></script>
-<script src="api/insurers/hachshara.js"></script>
-<script src="api/insurers/aig.js"></script>
-<script src="api/insurers/ayalon.js"></script>
+<script src="mock-api/insurer-api.js"></script>
+<script src="mock-api/insurers/phoenix.js"></script>
+<script src="mock-api/insurers/harel.js"></script>
+<script src="mock-api/insurers/migdal.js"></script>
+<script src="mock-api/insurers/clal.js"></script>
+<script src="mock-api/insurers/menora.js"></script>
+<script src="mock-api/insurers/yashir.js"></script>
+<script src="mock-api/insurers/shirbit.js"></script>
+<script src="mock-api/insurers/hachshara.js"></script>
+<script src="mock-api/insurers/aig.js"></script>
+<script src="mock-api/insurers/ayalon.js"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -242,7 +242,7 @@ const L = {
   owner: { PRIVATE: "פרטית", PRIVATE_YOUNG_DRIVER: "פרטית – נהג צעיר" },
 };
 const FILES = ["data.json", "data2.json", "upload"];
-let POOL = []; // חברות הביטוח הפעילות מטבלת insurers ב-DB שיש להן שירות ב-api/insurers/ (נטען באתחול)
+let POOL = []; // חברות הביטוח הפעילות מטבלת insurers ב-DB שיש להן שירות ב-mock-api/insurers/ (נטען באתחול)
 let LOGO_PATHS = {};
 const KIND_LABEL = { comprehensive: "ביטוח רכב מקיף + חובה", third: "ביטוח רכב צד שלישי + חובה", mandatory: "ביטוח רכב חובה" };
 const KIND_SCALE = { comprehensive: 1, third: 0.35, mandatory: 0.22 };
@@ -723,7 +723,7 @@ function renderResults() {
   $("#app").innerHTML = `
     <a class="back" href="index.html">חזרה להביטוחים שלי</a>
     <h1>השוואת ביטוח רכב</h1>
-    <div class="demo-note">הדגמה בלבד · ההצעות מתקבלות מקריאות API מדומות לשירותי חברות הביטוח (קבצים בתיקיית api/), והמחירים אינם תעריפים אמיתיים</div>
+    <div class="demo-note">הדגמה בלבד · ההצעות מתקבלות מקריאות API מדומות לשירותי חברות הביטוח (קבצים בתיקיית mock-api/), והמחירים אינם תעריפים אמיתיים</div>
 
     <div class="row-h"><h2>הפרטים שעליהם מבוססת ההשוואה</h2><button class="ghost" id="edit" type="button">עריכת הפרטים</button></div>
     <section class="card basis">

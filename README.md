@@ -51,5 +51,5 @@ npm run dev:memory          # שרת עם מסד בזיכרון, בלי Neon
 
 - `server/`: שרת Express (`index.js`), נתיבי כניסה (`auth.js`), חיבור ל-Neon (`db.js`), אבטחה (`security.js`)
 - `db/schema.sql`: הסכמה
-- `api/`: הדמיית שירותי חברות הביטוח (ראו `api/README.md`)
+- `mock-api/`: הדמיית שירותי חברות הביטוח (ראו `mock-api/README.md`)
 - `*.html`, `auth.js`, `brand.js`, `header.css`, `theme.css`: הממשק
